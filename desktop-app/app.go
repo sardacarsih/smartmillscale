@@ -70,6 +70,8 @@ func (a *App) OnStartup(ctx context.Context) {
 		config.DebugMode = true
 	}
 
+	log.Printf("Using database path: %s", config.DatabasePath)
+
 	// Initialize logger
 	a.logger = logger.NewLogger(config.DebugMode)
 	a.logger.Info("Initializing Smart Mill Scale Core Services", map[string]interface{}{
@@ -157,7 +159,6 @@ func (a *App) InitializeAuthenticatedServices(userRole string) error {
 func (a *App) IsServicesReady() bool {
 	return a.servicesReady
 }
-
 
 // RequireAuthenticatedServices ensures that authenticated services are initialized
 func (a *App) RequireAuthenticatedServices() error {

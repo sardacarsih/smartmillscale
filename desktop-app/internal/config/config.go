@@ -166,15 +166,15 @@ func createDefaultConfig() *AppConfig {
 			DeviceID:     uuid.New(),
 			DeviceName:   "Timbangan Baru",
 			Location:     "Gudang",
-			DatabasePath: "./data/smartmill.db",
+			DatabasePath: "./data/smartmillscale.db",
 			Weighing: types.WeighingConfig{
-				COMPort:         "COM1",
-				BaudRate:        9600,
-				DataBits:        8,
-				StopBits:        1,
-				Parity:          "N",
-				ReadTimeout:     5000,
-				WriteTimeout:    5000,
+				COMPort:           "COM1",
+				BaudRate:          9600,
+				DataBits:          8,
+				StopBits:          1,
+				Parity:            "N",
+				ReadTimeout:       5000,
+				WriteTimeout:      5000,
 				MockSerialEnabled: true,
 			},
 			Sync: types.SyncConfig{
@@ -206,23 +206,23 @@ func createDefaultConfigFromEnv() *AppConfig {
 			DeviceID:     uuid.New(),
 			DeviceName:   getEnvOrDefault("DEVICE_NAME_DEFAULT", "Timbangan Baru"),
 			Location:     getEnvOrDefault("DEVICE_LOCATION_DEFAULT", "Gudang"),
-			DatabasePath: getEnvOrDefault("DB_PATH", "./data/smartmill.db"),
+			DatabasePath: "./data/smartmillscale.db",
 			Weighing: types.WeighingConfig{
-				COMPort:         getEnvOrDefault("SERIAL_COM_PORT", "COM1"),
-				BaudRate:        getEnvIntOrDefault("SERIAL_BAUD_RATE", 9600),
-				DataBits:        getEnvIntOrDefault("SERIAL_DATA_BITS", 8),
-				StopBits:        getEnvIntOrDefault("SERIAL_STOP_BITS", 1),
-				Parity:          getEnvOrDefault("SERIAL_PARITY", "N"),
-				ReadTimeout:     getEnvIntOrDefault("SERIAL_READ_TIMEOUT", 1000),
-				WriteTimeout:    getEnvIntOrDefault("SERIAL_WRITE_TIMEOUT", 1000),
+				COMPort:           getEnvOrDefault("SERIAL_COM_PORT", "COM1"),
+				BaudRate:          getEnvIntOrDefault("SERIAL_BAUD_RATE", 9600),
+				DataBits:          getEnvIntOrDefault("SERIAL_DATA_BITS", 8),
+				StopBits:          getEnvIntOrDefault("SERIAL_STOP_BITS", 1),
+				Parity:            getEnvOrDefault("SERIAL_PARITY", "N"),
+				ReadTimeout:       getEnvIntOrDefault("SERIAL_READ_TIMEOUT", 1000),
+				WriteTimeout:      getEnvIntOrDefault("SERIAL_WRITE_TIMEOUT", 1000),
 				MockSerialEnabled: getEnvBoolOrDefault("MOCK_SERIAL_ENABLED", true),
 
 				// Mock Serial Configuration from .env
 				// Note: .env values are in kg, convert to centesimal (1 kg = 100 centesimal)
-				MockInterval:  getEnvIntOrDefault("MOCK_SERIAL_INTERVAL", 1000),           // 1s default in milliseconds
-				MockMinWeight: getEnvIntOrDefault("MOCK_SERIAL_MIN_WEIGHT", 0) * 100,      // 0 kg -> centesimal
-				MockMaxWeight: getEnvIntOrDefault("MOCK_SERIAL_MAX_WEIGHT", 15000) * 100,  // 15000 kg -> centesimal
-				MockVariance:  getEnvIntOrDefault("MOCK_SERIAL_VARIANCE", 50) * 100,       // 50 kg -> centesimal
+				MockInterval:  getEnvIntOrDefault("MOCK_SERIAL_INTERVAL", 1000),          // 1s default in milliseconds
+				MockMinWeight: getEnvIntOrDefault("MOCK_SERIAL_MIN_WEIGHT", 0) * 100,     // 0 kg -> centesimal
+				MockMaxWeight: getEnvIntOrDefault("MOCK_SERIAL_MAX_WEIGHT", 15000) * 100, // 15000 kg -> centesimal
+				MockVariance:  getEnvIntOrDefault("MOCK_SERIAL_VARIANCE", 50) * 100,      // 50 kg -> centesimal
 			},
 			Sync: types.SyncConfig{
 				ServerURL:      getEnvOrDefault("SYNC_SERVER_URL", "https://localhost:8443/graphql"),
@@ -261,9 +261,6 @@ func overrideConfigFromEnv(config *AppConfig) {
 	}
 	if location := os.Getenv("DEVICE_LOCATION"); location != "" {
 		config.Location = location
-	}
-	if dbPath := os.Getenv("DB_PATH"); dbPath != "" {
-		config.DatabasePath = dbPath
 	}
 
 	// Serial port configuration

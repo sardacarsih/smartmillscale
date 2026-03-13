@@ -61,6 +61,9 @@ func (app *Application) InitializeForRole(ctx context.Context, userRole string) 
 	}
 	app.appConfig = appConfig
 
+	// Force canonical runtime database path from bootstrap config to prevent split DB usage.
+	app.appConfig.DatabasePath = app.config.DatabasePath
+
 	// Initialize database if not already initialized
 	var db *gorm.DB
 	if app.Container == nil || app.Container.DB == nil {

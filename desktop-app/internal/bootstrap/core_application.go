@@ -6,18 +6,18 @@ import (
 	"log"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/auth"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/config"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/database"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/infrastructure/persistence/models"
+	"gorm.io/gorm"
 )
 
 // CoreApplication represents essential services needed for authentication
 type CoreApplication struct {
-	Container   *CoreContainer
-	config      *Config
-	appConfig   *config.AppConfig
+	Container *CoreContainer
+	config    *Config
+	appConfig *config.AppConfig
 }
 
 // NewCoreApplication creates a new core application instance
@@ -36,6 +36,9 @@ func (app *CoreApplication) InitializeCore(ctx context.Context) error {
 		return fmt.Errorf("failed to load application config: %w", err)
 	}
 	app.appConfig = appConfig
+
+	// Force canonical runtime database path from bootstrap config to prevent split DB usage.
+	app.appConfig.DatabasePath = app.config.DatabasePath
 
 	// Initialize database
 	db, err := app.initDatabase()
@@ -121,9 +124,9 @@ func (app *CoreApplication) runCoreMigrations(db *gorm.DB) error {
 
 	// Auto migrate only essential models for authentication
 	migrations := []interface{}{
-		&models.UserModel{},           // User authentication
-		&models.DeviceInfoModel{},     // Device identification
-		&models.AuditLogModel{},       // Basic audit logging
+		&models.UserModel{},       // User authentication
+		&models.DeviceInfoModel{}, // Device identification
+		&models.AuditLogModel{},   // Basic audit logging
 	}
 
 	// Run migrations with error handling
@@ -147,7 +150,7 @@ func (app *CoreApplication) fixUserRoles(db *gorm.DB) error {
 		"supervisor": auth.RoleSupervisor,
 		"timbangan":  auth.RoleTimbangan,
 		"grading":    auth.RoleGrading,
-		"ADMIN":      auth.RoleAdmin,      // Already correct, but include for completeness
+		"ADMIN":      auth.RoleAdmin, // Already correct, but include for completeness
 		"SUPERVISOR": auth.RoleSupervisor,
 		"TIMBANGAN":  auth.RoleTimbangan,
 		"GRADING":    auth.RoleGrading,

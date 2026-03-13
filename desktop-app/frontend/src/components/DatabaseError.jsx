@@ -111,7 +111,7 @@ const DatabaseError = ({ onRetry, error }) => {
         {/* Debug Info */}
         <div className="mt-6 text-center">
           <p className="text-gray-500 text-xs">
-            Database Path: ./data/smartmill.db
+            Database Path: ./data/smartmillscale.db
           </p>
           <p className="text-gray-500 text-xs">
             Required: SQLite Database with Authentication

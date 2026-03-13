@@ -11,6 +11,11 @@ import (
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
+const (
+	defaultDatabaseDirName  = "data"
+	defaultDatabaseFileName = "smartmillscale.db"
+)
+
 // getDeviceID generates a unique device identifier
 func getDeviceID() string {
 	hostname, _ := os.Hostname()
@@ -100,120 +105,79 @@ func getIntSafely(data map[string]interface{}, key string) int {
 
 // getAppDataPath returns the application data directory path
 func getAppDataPath() string {
-	// Use the same logic as getWindowsDatabasePath but for the base directory
-	if runtime.GOOS == "windows" {
-		path := getWindowsDatabasePath()
-		return filepath.Dir(filepath.Dir(path)) // Go up two levels from .../data/smartmillscale.db
-	}
-
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "."
-	}
-	return filepath.Join(homeDir, ".gosmartmillscale")
+	dbPath := getDatabasePath()
+	return filepath.Dir(filepath.Dir(dbPath))
 }
 
 // Path determination functions moved from app.go
 
-// getDatabasePath returns the proper database path for production with enhanced Windows handling
+// getDatabasePath returns one canonical database path.
 func getDatabasePath() string {
-	// Check for DB_PATH from .env first (Standard)
-	if dbPath := os.Getenv("DB_PATH"); dbPath != "" {
-		if cleanPath := filepath.Clean(dbPath); cleanPath != "" {
-			return cleanPath
-		}
+	if projectPath, found := resolveProjectDatabasePath(); found {
+		return projectPath
 	}
 
-	// Check for SMARTMILL_DB_PATH environment variable (Legacy/Override)
-	if dbPath := os.Getenv("SMARTMILL_DB_PATH"); dbPath != "" {
-		// Validate environment variable path
-		if cleanPath := filepath.Clean(dbPath); cleanPath != "" {
-			return cleanPath
-		}
-	}
-
-	// Check for portable mode (config file next to executable)
-	if isPortableMode() {
-		exePath, err := os.Executable()
-		if err == nil {
-			portableDBPath := filepath.Join(filepath.Dir(exePath), "data", "smartmillscale.db")
-			return portableDBPath
-		}
-	}
-
-	// Default: Use %LOCALAPPDATA% on Windows with enhanced fallbacks
-	if runtime.GOOS == "windows" {
-		return getWindowsDatabasePath()
-	}
-
-	// Fallback for other OS - use current working directory with data subdirectory
-	cwd, err := os.Getwd()
+	// Fallback for environments where project markers are unavailable.
+	fallback := filepath.Join(".", defaultDatabaseDirName, defaultDatabaseFileName)
+	absPath, err := filepath.Abs(fallback)
 	if err != nil {
-		cwd = "."
+		return filepath.Clean(fallback)
 	}
-	return filepath.Join(cwd, "data", "smartmillscale.db")
+	return absPath
 }
 
-// getWindowsDatabasePath determines the best database path on Windows
-func getWindowsDatabasePath() string {
-	var paths []string
-
-	// Primary: %LOCALAPPDATA%
-	if localAppData := os.Getenv("LOCALAPPDATA"); localAppData != "" {
-		paths = append(paths, filepath.Join(localAppData, "SmartMillScale", "data", "smartmillscale.db"))
+func resolveProjectDatabasePath() (string, bool) {
+	if cwd, err := os.Getwd(); err == nil {
+		if path, found := findProjectDatabasePathFrom(cwd); found {
+			return path, true
+		}
 	}
 
-	// Secondary: %USERPROFILE%\AppData\Local
-	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		paths = append(paths, filepath.Join(userProfile, "AppData", "Local", "SmartMillScale", "data", "smartmillscale.db"))
-	}
-
-	// Tertiary: %TEMP% (as last resort)
-	if tempDir := os.Getenv("TEMP"); tempDir != "" {
-		paths = append(paths, filepath.Join(tempDir, "SmartMillScale", "data", "smartmillscale.db"))
-	}
-
-	// Quaternary: Current working directory
-	cwd, err := os.Getwd()
+	exePath, err := os.Executable()
 	if err == nil {
-		paths = append(paths, filepath.Join(cwd, "data", "smartmillscale.db"))
-	}
-
-	// Find the first writable path
-	for _, path := range paths {
-		if isPathWritable(path) {
-			return path
+		if path, found := findProjectDatabasePathFrom(filepath.Dir(exePath)); found {
+			return path, true
 		}
 	}
 
-	// Last fallback: use the first path anyway
-	if len(paths) > 0 {
-		return paths[0]
+	// In `wails dev`, process CWD/executable can be in a temp directory.
+	// Use source-file location (if available) to keep DB path stable in project workspace.
+	if _, sourceFile, _, ok := runtime.Caller(0); ok {
+		if path, found := findProjectDatabasePathFrom(filepath.Dir(sourceFile)); found {
+			return path, true
+		}
 	}
 
-	// Ultimate fallback
-	return "./data/smartmillscale.db"
+	return "", false
 }
 
-// isPathWritable checks if a path is writable by attempting to create directories
-func isPathWritable(path string) bool {
-	dir := filepath.Dir(path)
+func findProjectDatabasePathFrom(startDir string) (string, bool) {
+	dir := filepath.Clean(startDir)
 
-	// Try to create the directory
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return false
+	for i := 0; i < 8; i++ {
+		// Running from desktop-app (contains wails.json).
+		if fileExists(filepath.Join(dir, "wails.json")) {
+			return filepath.Join(dir, defaultDatabaseDirName, defaultDatabaseFileName), true
+		}
+
+		// Running from repository root (contains desktop-app/wails.json).
+		if fileExists(filepath.Join(dir, "desktop-app", "wails.json")) {
+			return filepath.Join(dir, "desktop-app", defaultDatabaseDirName, defaultDatabaseFileName), true
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			break
+		}
+		dir = parent
 	}
 
-	// Test write permissions
-	testFile := filepath.Join(dir, ".write_test")
-	err := os.WriteFile(testFile, []byte("test"), 0644)
-	if err != nil {
-		return false
-	}
+	return "", false
+}
 
-	// Clean up
-	os.Remove(testFile)
-	return true
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 // getConfigFilePath returns the configuration file path
