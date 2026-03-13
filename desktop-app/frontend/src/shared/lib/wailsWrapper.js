@@ -60,6 +60,13 @@ export function createMockWailsWrapper() {
 
     try {
         const eventListeners = new Map()
+        const nowIso = () => new Date().toISOString()
+        let masterSyncStatus = {
+            syncInProgress: false,
+            lastAttemptAt: null,
+            lastSuccessAt: null,
+            lastResult: null
+        }
 
     return {
         // Mock authentication methods
@@ -226,34 +233,38 @@ export function createMockWailsWrapper() {
 
         GetEstates: async (activeOnly) => {
             console.log('[Mock] GetEstates')
+            const now = nowIso()
             return JSON.stringify([
-                { id: 1, kode_estate: 'EST01', nama_estate: 'Estate A', luas: 1000, is_active: true },
-                { id: 2, kode_estate: 'EST02', nama_estate: 'Estate B', luas: 2000, is_active: true }
+                { id: 1, kode_estate: 'EST01', nama_estate: 'Estate A', luas: 1000, is_active: true, data_source: 'SERVER', last_synced_at: now },
+                { id: 2, kode_estate: 'EST02', nama_estate: 'Estate B', luas: 2000, is_active: true, data_source: 'MANUAL', last_synced_at: null }
             ])
         },
-        CreateEstate: async (data, userId) => JSON.stringify({ id: 99, ...JSON.parse(data), is_active: true }),
-        UpdateEstate: async (id, data, userId) => JSON.stringify({ id, ...JSON.parse(data), is_active: true }),
+        CreateEstate: async (data, userId) => JSON.stringify({ id: 99, ...JSON.parse(data), is_active: true, data_source: 'MANUAL', last_synced_at: null }),
+        UpdateEstate: async (id, data, userId) => JSON.stringify({ id, ...JSON.parse(data), is_active: true, data_source: 'MANUAL', last_synced_at: null }),
         DeleteEstate: async (id, userId) => true,
 
         GetAfdelings: async (activeOnly) => {
             console.log('[Mock] GetAfdelings')
+            const now = nowIso()
             return JSON.stringify([
-                { id: 1, id_estate: 1, kode_afdeling: 'AFD01', nama_afdeling: 'Afdeling 1', luas: 100, is_active: true },
-                { id: 2, id_estate: 1, kode_afdeling: 'AFD02', nama_afdeling: 'Afdeling 2', luas: 200, is_active: true }
+                { id: 1, id_estate: 1, kode_afdeling: 'AFD01', nama_afdeling: 'Afdeling 1', luas: 100, is_active: true, data_source: 'SERVER', last_synced_at: now },
+                { id: 2, id_estate: 1, kode_afdeling: 'AFD02', nama_afdeling: 'Afdeling 2', luas: 200, is_active: true, data_source: 'MANUAL', last_synced_at: null }
             ])
         },
         GetAfdelingsByEstate: async (estateId, activeOnly) => {
             console.log('[Mock] GetAfdelingsByEstate')
+            const now = nowIso()
             return JSON.stringify([
-                { id: 1, id_estate: estateId, kode_afdeling: 'AFD01', nama_afdeling: 'Afdeling 1', luas: 100, is_active: true }
+                { id: 1, id_estate: estateId, kode_afdeling: 'AFD01', nama_afdeling: 'Afdeling 1', luas: 100, is_active: true, data_source: 'SERVER', last_synced_at: now }
             ])
         },
-        CreateAfdeling: async (data, userId) => JSON.stringify({ id: 99, ...JSON.parse(data), is_active: true }),
-        UpdateAfdeling: async (id, data, userId) => JSON.stringify({ id, ...JSON.parse(data), is_active: true }),
+        CreateAfdeling: async (data, userId) => JSON.stringify({ id: 99, ...JSON.parse(data), is_active: true, data_source: 'MANUAL', last_synced_at: null }),
+        UpdateAfdeling: async (id, data, userId) => JSON.stringify({ id, ...JSON.parse(data), is_active: true, data_source: 'MANUAL', last_synced_at: null }),
         DeleteAfdeling: async (id, userId) => true,
 
         GetBlok: async (activeOnly) => {
             console.log('[Mock] GetBlok')
+            const now = nowIso()
             return JSON.stringify([
                 {
                     id: 1,
@@ -262,12 +273,14 @@ export function createMockWailsWrapper() {
                     nama_blok: 'Blok A',
                     luas: 10,
                     is_active: true,
-                    Afdeling: {
+                    data_source: 'SERVER',
+                    last_synced_at: now,
+                    afdeling: {
                         id: 1,
                         id_estate: 1,
                         kode_afdeling: 'AFD01',
                         nama_afdeling: 'Afdeling 1',
-                        Estate: {
+                        estate: {
                             id: 1,
                             kode_estate: 'EST01',
                             nama_estate: 'Estate A'
@@ -281,12 +294,14 @@ export function createMockWailsWrapper() {
                     nama_blok: 'Blok B',
                     luas: 20,
                     is_active: true,
-                    Afdeling: {
+                    data_source: 'MANUAL',
+                    last_synced_at: null,
+                    afdeling: {
                         id: 1,
                         id_estate: 1,
                         kode_afdeling: 'AFD01',
                         nama_afdeling: 'Afdeling 1',
-                        Estate: {
+                        estate: {
                             id: 1,
                             kode_estate: 'EST01',
                             nama_estate: 'Estate A'
@@ -297,13 +312,47 @@ export function createMockWailsWrapper() {
         },
         GetBlokByAfdeling: async (afdelingId, activeOnly) => {
             console.log('[Mock] GetBlokByAfdeling')
+            const now = nowIso()
             return JSON.stringify([
-                { id: 1, id_afdeling: afdelingId, kode_blok: 'BLK01', nama_blok: 'Blok A', luas: 10, is_active: true }
+                { id: 1, id_afdeling: afdelingId, kode_blok: 'BLK01', nama_blok: 'Blok A', luas: 10, is_active: true, data_source: 'SERVER', last_synced_at: now }
             ])
         },
-        CreateBlok: async (data, userId) => JSON.stringify({ id: 99, ...JSON.parse(data), is_active: true }),
-        UpdateBlok: async (id, data, userId) => JSON.stringify({ id, ...JSON.parse(data), is_active: true }),
+        CreateBlok: async (data, userId) => JSON.stringify({ id: 99, ...JSON.parse(data), is_active: true, data_source: 'MANUAL', last_synced_at: null }),
+        UpdateBlok: async (id, data, userId) => JSON.stringify({ id, ...JSON.parse(data), is_active: true, data_source: 'MANUAL', last_synced_at: null }),
         DeleteBlok: async (id, userId) => true,
+
+        TriggerMasterDataSync: async (requestJSON) => {
+            console.log('[Mock] TriggerMasterDataSync', requestJSON)
+            const request = requestJSON ? JSON.parse(requestJSON) : {}
+            const syncedAt = nowIso()
+            const result = {
+                success: true,
+                isOnline: true,
+                triggerSource: request.triggerSource || 'manual',
+                scope: Array.isArray(request.scope) && request.scope.length > 0 ? request.scope : ['estate', 'afdeling', 'blok'],
+                syncedAt,
+                counts: {
+                    estate: { created: 0, updated: 1, deactivated: 0, skipped: 0 },
+                    afdeling: { created: 0, updated: 1, deactivated: 0, skipped: 0 },
+                    blok: { created: 0, updated: 1, deactivated: 0, skipped: 0 }
+                },
+                error: ''
+            }
+
+            masterSyncStatus = {
+                syncInProgress: false,
+                lastAttemptAt: syncedAt,
+                lastSuccessAt: syncedAt,
+                lastResult: result
+            }
+
+            return JSON.stringify(result)
+        },
+
+        GetMasterDataSyncStatus: async () => {
+            console.log('[Mock] GetMasterDataSyncStatus')
+            return JSON.stringify(masterSyncStatus)
+        },
 
         // Mock API Key methods (fallback only when backend is unavailable)
         GetAPIKeys: async () => {
@@ -435,3 +484,5 @@ export function getWailsWrapper(allowMock = true) {
         throw error
     }
 }
+
+

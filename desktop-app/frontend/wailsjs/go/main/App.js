@@ -174,6 +174,10 @@ export function GetEstates(arg1) {
   return window['go']['main']['App']['GetEstates'](arg1);
 }
 
+export function GetMasterDataSyncStatus() {
+  return window['go']['main']['App']['GetMasterDataSyncStatus']();
+}
+
 export function GetMetricsData(arg1, arg2) {
   return window['go']['main']['App']['GetMetricsData'](arg1, arg2);
 }
@@ -280,6 +284,10 @@ export function GetSyncStatusTyped() {
 
 export function GetSystemHealth() {
   return window['go']['main']['App']['GetSystemHealth']();
+}
+
+export function GetSystemSettings() {
+  return window['go']['main']['App']['GetSystemSettings']();
 }
 
 export function GetTicketByNumber(arg1) {
@@ -458,6 +466,10 @@ export function TriggerManualSync(arg1) {
   return window['go']['main']['App']['TriggerManualSync'](arg1);
 }
 
+export function TriggerMasterDataSync(arg1) {
+  return window['go']['main']['App']['TriggerMasterDataSync'](arg1);
+}
+
 export function UnsubscribeFromWeightEvents(arg1) {
   return window['go']['main']['App']['UnsubscribeFromWeightEvents'](arg1);
 }
@@ -506,6 +518,10 @@ export function UpdateSyncConfig(arg1) {
   return window['go']['main']['App']['UpdateSyncConfig'](arg1);
 }
 
+export function UpdateSystemSettings(arg1) {
+  return window['go']['main']['App']['UpdateSystemSettings'](arg1);
+}
+
 export function UpdateTimbang2(arg1, arg2) {
   return window['go']['main']['App']['UpdateTimbang2'](arg1, arg2);
 }
@@ -528,13 +544,4 @@ export function ValidatePKSReportRequest(arg1, arg2) {
 
 export function ValidateWeighing(arg1) {
   return window['go']['main']['App']['ValidateWeighing'](arg1);
-}
-
-
-export function GetSystemSettings() {
-  return window['go']['main']['App']['GetSystemSettings']();
-}
-
-export function UpdateSystemSettings(arg1) {
-  return window['go']['main']['App']['UpdateSystemSettings'](arg1);
 }

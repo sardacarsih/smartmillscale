@@ -90,6 +90,8 @@ export function GetEstatePaginated(arg1:string):Promise<string>;
 
 export function GetEstates(arg1:boolean):Promise<string>;
 
+export function GetMasterDataSyncStatus():Promise<string>;
+
 export function GetMetricsData(arg1:string,arg2:string):Promise<string>;
 
 export function GetNextWeightEvent(arg1:string):Promise<string>;
@@ -143,6 +145,8 @@ export function GetSyncStatus():Promise<string>;
 export function GetSyncStatusTyped():Promise<main.SyncStatusResponse>;
 
 export function GetSystemHealth():Promise<string>;
+
+export function GetSystemSettings():Promise<string>;
 
 export function GetTicketByNumber(arg1:string):Promise<string>;
 
@@ -232,6 +236,8 @@ export function TestCOMPortConnection(arg1:string):Promise<string>;
 
 export function TriggerManualSync(arg1:string):Promise<string>;
 
+export function TriggerMasterDataSync(arg1:string):Promise<string>;
+
 export function UnsubscribeFromWeightEvents(arg1:string):Promise<string>;
 
 export function UpdateAPIKey(arg1:string,arg2:string):Promise<string>;
@@ -256,6 +262,8 @@ export function UpdateSupplier(arg1:string,arg2:string):Promise<string>;
 
 export function UpdateSyncConfig(arg1:string):Promise<void>;
 
+export function UpdateSystemSettings(arg1:string):Promise<void>;
+
 export function UpdateTimbang2(arg1:string,arg2:string):Promise<string>;
 
 export function UpdateUnit(arg1:string,arg2:string):Promise<string>;
@@ -267,6 +275,3 @@ export function UpdateWeighing(arg1:string,arg2:string):Promise<string>;
 export function ValidatePKSReportRequest(arg1:context.Context,arg2:service.ReportRequest):Promise<service.ValidationResult>;
 
 export function ValidateWeighing(arg1:string):Promise<string>;
-
-export function GetSystemSettings():Promise<string>;
-export function UpdateSystemSettings(arg1:string):Promise<void>;

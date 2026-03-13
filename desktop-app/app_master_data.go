@@ -157,3 +157,15 @@ func (a *App) GetBlok(activeOnly bool) (string, error) {
 		return a.application.Container.PKSMasterController.GetBlok(activeOnly)
 	})
 }
+
+func (a *App) TriggerMasterDataSync(requestJSON string) (string, error) {
+	return a.handler.Handle(func() (interface{}, error) {
+		return a.application.Container.PKSMasterController.TriggerMasterDataSync(requestJSON)
+	})
+}
+
+func (a *App) GetMasterDataSyncStatus() (string, error) {
+	return a.handler.Handle(func() (interface{}, error) {
+		return a.application.Container.PKSMasterController.GetMasterDataSyncStatus()
+	})
+}

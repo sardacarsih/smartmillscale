@@ -18,37 +18,46 @@ type AfdelingNested struct {
 
 // EstateResponse is the DTO for estate responses
 type EstateResponse struct {
-	ID         uint      `json:"id"`
-	KodeEstate string    `json:"kode_estate"`
-	NamaEstate string    `json:"nama_estate"`
-	Luas       float64   `json:"luas"`
-	Lokasi     string    `json:"lokasi"`
-	IsActive   bool      `json:"is_active"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID              uint       `json:"id"`
+	KodeEstate      string     `json:"kode_estate"`
+	NamaEstate      string     `json:"nama_estate"`
+	Luas            float64    `json:"luas"`
+	Lokasi          string     `json:"lokasi"`
+	IsActive        bool       `json:"is_active"`
+	DataSource      string     `json:"data_source"`
+	LastSyncedAt    *time.Time `json:"last_synced_at,omitempty"`
+	ServerUpdatedAt *time.Time `json:"server_updated_at,omitempty"`
+	CreatedAt       time.Time  `json:"created_at"`
 }
 
 // AfdelingResponse is the DTO for afdeling responses
 type AfdelingResponse struct {
-	ID           uint            `json:"id"`
-	IDEstate     uint            `json:"id_estate"`
-	KodeAfdeling string          `json:"kode_afdeling"`
-	NamaAfdeling string          `json:"nama_afdeling"`
-	Estate       *EstateNested   `json:"estate,omitempty"`
-	Luas         float64         `json:"luas"`
-	IsActive     bool            `json:"is_active"`
-	CreatedAt    time.Time       `json:"created_at"`
+	ID              uint          `json:"id"`
+	IDEstate        uint          `json:"id_estate"`
+	KodeAfdeling    string        `json:"kode_afdeling"`
+	NamaAfdeling    string        `json:"nama_afdeling"`
+	Estate          *EstateNested `json:"estate,omitempty"`
+	Luas            float64       `json:"luas"`
+	IsActive        bool          `json:"is_active"`
+	DataSource      string        `json:"data_source"`
+	LastSyncedAt    *time.Time    `json:"last_synced_at,omitempty"`
+	ServerUpdatedAt *time.Time    `json:"server_updated_at,omitempty"`
+	CreatedAt       time.Time     `json:"created_at"`
 }
 
 // BlockResponse is the DTO for block responses
 type BlockResponse struct {
-	ID         uint              `json:"id"`
-	IDAfdeling uint              `json:"id_afdeling"`
-	KodeBlok   string            `json:"kode_blok"`
-	NamaBlok   string            `json:"nama_blok"`
-	Afdeling   *AfdelingNested   `json:"afdeling,omitempty"`
-	Luas       float64           `json:"luas"`
-	IsActive   bool              `json:"is_active"`
-	CreatedAt  time.Time         `json:"created_at"`
+	ID              uint            `json:"id"`
+	IDAfdeling      uint            `json:"id_afdeling"`
+	KodeBlok        string          `json:"kode_blok"`
+	NamaBlok        string          `json:"nama_blok"`
+	Afdeling        *AfdelingNested `json:"afdeling,omitempty"`
+	Luas            float64         `json:"luas"`
+	IsActive        bool            `json:"is_active"`
+	DataSource      string          `json:"data_source"`
+	LastSyncedAt    *time.Time      `json:"last_synced_at,omitempty"`
+	ServerUpdatedAt *time.Time      `json:"server_updated_at,omitempty"`
+	CreatedAt       time.Time       `json:"created_at"`
 }
 
 // Helper functions to transform database models to DTOs
@@ -56,13 +65,16 @@ type BlockResponse struct {
 // ToEstateResponse converts MasterEstate to EstateResponse
 func ToEstateResponse(estate *database.MasterEstate) *EstateResponse {
 	return &EstateResponse{
-		ID:         estate.ID,
-		KodeEstate: estate.KodeEstate,
-		NamaEstate: estate.NamaEstate,
-		Luas:       estate.Luas,
-		Lokasi:     estate.Lokasi,
-		IsActive:   estate.IsActive,
-		CreatedAt:  estate.CreatedAt,
+		ID:              estate.ID,
+		KodeEstate:      estate.KodeEstate,
+		NamaEstate:      estate.NamaEstate,
+		Luas:            estate.Luas,
+		Lokasi:          estate.Lokasi,
+		IsActive:        estate.IsActive,
+		DataSource:      estate.DataSource,
+		LastSyncedAt:    estate.LastSyncedAt,
+		ServerUpdatedAt: estate.ServerUpdatedAt,
+		CreatedAt:       estate.CreatedAt,
 	}
 }
 
@@ -83,13 +95,16 @@ func ToEstateResponses(estates []database.MasterEstate) []EstateResponse {
 // ToAfdelingResponse converts MasterAfdeling to AfdelingResponse
 func ToAfdelingResponse(afdeling *database.MasterAfdeling) *AfdelingResponse {
 	response := &AfdelingResponse{
-		ID:           afdeling.ID,
-		IDEstate:     afdeling.IDEstate,
-		KodeAfdeling: afdeling.KodeAfdeling,
-		NamaAfdeling: afdeling.NamaAfdeling,
-		Luas:         afdeling.Luas,
-		IsActive:     afdeling.IsActive,
-		CreatedAt:    afdeling.CreatedAt,
+		ID:              afdeling.ID,
+		IDEstate:        afdeling.IDEstate,
+		KodeAfdeling:    afdeling.KodeAfdeling,
+		NamaAfdeling:    afdeling.NamaAfdeling,
+		Luas:            afdeling.Luas,
+		IsActive:        afdeling.IsActive,
+		DataSource:      afdeling.DataSource,
+		LastSyncedAt:    afdeling.LastSyncedAt,
+		ServerUpdatedAt: afdeling.ServerUpdatedAt,
+		CreatedAt:       afdeling.CreatedAt,
 	}
 
 	// Include estate info if preloaded
@@ -119,13 +134,16 @@ func ToAfdelingResponses(afdelings []database.MasterAfdeling) []AfdelingResponse
 // ToBlockResponse converts MasterBlok to BlockResponse
 func ToBlockResponse(blok *database.MasterBlok) *BlockResponse {
 	response := &BlockResponse{
-		ID:         blok.ID,
-		IDAfdeling: blok.IDAfdeling,
-		KodeBlok:   blok.KodeBlok,
-		NamaBlok:   blok.NamaBlok,
-		Luas:       blok.Luas,
-		IsActive:   blok.IsActive,
-		CreatedAt:  blok.CreatedAt,
+		ID:              blok.ID,
+		IDAfdeling:      blok.IDAfdeling,
+		KodeBlok:        blok.KodeBlok,
+		NamaBlok:        blok.NamaBlok,
+		Luas:            blok.Luas,
+		IsActive:        blok.IsActive,
+		DataSource:      blok.DataSource,
+		LastSyncedAt:    blok.LastSyncedAt,
+		ServerUpdatedAt: blok.ServerUpdatedAt,
+		CreatedAt:       blok.CreatedAt,
 	}
 
 	// Include afdeling info if preloaded

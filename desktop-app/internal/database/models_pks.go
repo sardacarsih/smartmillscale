@@ -9,6 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	MasterDataSourceManual = "MANUAL"
+	MasterDataSourceServer = "SERVER"
+)
+
 // MasterProduk represents master data for products in PKS system
 type MasterProduk struct {
 	ID         uint      `gorm:"primaryKey" json:"id"`
@@ -90,14 +95,17 @@ func (MasterCustomer) TableName() string {
 
 // MasterEstate represents master data for estates in PKS system (for TBS)
 type MasterEstate struct {
-	ID         uint      `gorm:"primaryKey" json:"id"`
-	KodeEstate string    `gorm:"uniqueIndex;not null" json:"kode_estate"`
-	NamaEstate string    `gorm:"not null" json:"nama_estate"`
-	Luas       float64   `json:"luas"` // hektar
-	Lokasi     string    `json:"lokasi"`
-	IsActive   bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID              uint       `gorm:"primaryKey" json:"id"`
+	KodeEstate      string     `gorm:"uniqueIndex;not null" json:"kode_estate"`
+	NamaEstate      string     `gorm:"not null" json:"nama_estate"`
+	Luas            float64    `json:"luas"` // hektar
+	Lokasi          string     `json:"lokasi"`
+	IsActive        bool       `gorm:"default:true" json:"is_active"`
+	DataSource      string     `gorm:"type:varchar(16);default:'MANUAL';index" json:"data_source"`
+	LastSyncedAt    *time.Time `json:"last_synced_at,omitempty"`
+	ServerUpdatedAt *time.Time `json:"server_updated_at,omitempty"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
 
 	// Relationships
 	Afdelings     []MasterAfdeling `gorm:"foreignKey:IDEstate" json:"afdelings,omitempty"`
@@ -111,14 +119,17 @@ func (MasterEstate) TableName() string {
 
 // MasterAfdeling represents master data for afdelings in PKS system (for TBS)
 type MasterAfdeling struct {
-	ID           uint      `gorm:"primaryKey" json:"id"`
-	IDEstate     uint      `gorm:"not null" json:"id_estate"`
-	KodeAfdeling string    `gorm:"not null" json:"kode_afdeling"`
-	NamaAfdeling string    `gorm:"not null" json:"nama_afdeling"`
-	Luas         float64   `json:"luas"` // hektar
-	IsActive     bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID              uint       `gorm:"primaryKey" json:"id"`
+	IDEstate        uint       `gorm:"not null;uniqueIndex:idx_master_afdeling_estate_kode" json:"id_estate"`
+	KodeAfdeling    string     `gorm:"not null;uniqueIndex:idx_master_afdeling_estate_kode" json:"kode_afdeling"`
+	NamaAfdeling    string     `gorm:"not null" json:"nama_afdeling"`
+	Luas            float64    `json:"luas"` // hektar
+	IsActive        bool       `gorm:"default:true" json:"is_active"`
+	DataSource      string     `gorm:"type:varchar(16);default:'MANUAL';index" json:"data_source"`
+	LastSyncedAt    *time.Time `json:"last_synced_at,omitempty"`
+	ServerUpdatedAt *time.Time `json:"server_updated_at,omitempty"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
 
 	// Relationships
 	Estate        MasterEstate   `gorm:"foreignKey:IDEstate" json:"estate"`
@@ -133,14 +144,17 @@ func (MasterAfdeling) TableName() string {
 
 // MasterBlok represents master data for blocks in PKS system (for TBS)
 type MasterBlok struct {
-	ID         uint      `gorm:"primaryKey" json:"id"`
-	IDAfdeling uint      `gorm:"not null" json:"id_afdeling"`
-	KodeBlok   string    `gorm:"not null" json:"kode_blok"`
-	NamaBlok   string    `gorm:"not null" json:"nama_blok"`
-	Luas       float64   `json:"luas"` // hektar
-	IsActive   bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	ID              uint       `gorm:"primaryKey" json:"id"`
+	IDAfdeling      uint       `gorm:"not null;uniqueIndex:idx_master_blok_afdeling_kode" json:"id_afdeling"`
+	KodeBlok        string     `gorm:"not null;uniqueIndex:idx_master_blok_afdeling_kode" json:"kode_blok"`
+	NamaBlok        string     `gorm:"not null" json:"nama_blok"`
+	Luas            float64    `json:"luas"` // hektar
+	IsActive        bool       `gorm:"default:true" json:"is_active"`
+	DataSource      string     `gorm:"type:varchar(16);default:'MANUAL';index" json:"data_source"`
+	LastSyncedAt    *time.Time `json:"last_synced_at,omitempty"`
+	ServerUpdatedAt *time.Time `json:"server_updated_at,omitempty"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
 
 	// Relationships
 	Afdeling      MasterAfdeling `gorm:"foreignKey:IDAfdeling" json:"afdeling"`
@@ -195,10 +209,10 @@ type TimbanganPKS struct {
 	UpdatedAt time.Time  `json:"updated_at"`
 
 	// Relationships
-	Produk   MasterProduk     `gorm:"foreignKey:IDProduk" json:"produk"`
-	Unit     MasterUnit       `gorm:"foreignKey:IDUnit" json:"unit"`
-	Supplier *MasterSupplier  `gorm:"foreignKey:IDSupplier" json:"supplier"` // Nullable: populated for non-TBS products only
-	Estate   *MasterEstate    `gorm:"foreignKey:IDEstate" json:"estate"`
+	Produk   MasterProduk    `gorm:"foreignKey:IDProduk" json:"produk"`
+	Unit     MasterUnit      `gorm:"foreignKey:IDUnit" json:"unit"`
+	Supplier *MasterSupplier `gorm:"foreignKey:IDSupplier" json:"supplier"` // Nullable: populated for non-TBS products only
+	Estate   *MasterEstate   `gorm:"foreignKey:IDEstate" json:"estate"`
 	Afdeling *MasterAfdeling `gorm:"foreignKey:IDAfdeling" json:"afdeling"`
 	Blok     *MasterBlok     `gorm:"foreignKey:IDBlok" json:"blok"`
 	Officer1 auth.User       `gorm:"foreignKey:Officer1ID" json:"officer1"`

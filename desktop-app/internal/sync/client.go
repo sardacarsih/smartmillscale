@@ -32,13 +32,13 @@ type GraphQLRequest struct {
 
 // GraphQLResponse represents a GraphQL response
 type GraphQLResponse struct {
-	Data   interface{}            `json:"data"`
-	Errors []GraphQLError         `json:"errors,omitempty"`
+	Data   interface{}    `json:"data"`
+	Errors []GraphQLError `json:"errors,omitempty"`
 }
 
 // GraphQLError represents a GraphQL error
 type GraphQLError struct {
-	Message string `json:"message"`
+	Message string   `json:"message"`
 	Path    []string `json:"path,omitempty"`
 }
 
@@ -396,4 +396,418 @@ func containsAny(s, substr string) bool {
 		}
 	}
 	return false
+}
+
+// MasterEstateReference represents estate master data fetched from server.
+type MasterEstateReference struct {
+	KodeEstate      string
+	NamaEstate      string
+	Luas            float64
+	Lokasi          string
+	IsActive        bool
+	ServerUpdatedAt *time.Time
+}
+
+// MasterAfdelingReference represents afdeling master data fetched from server.
+type MasterAfdelingReference struct {
+	KodeEstate      string
+	KodeAfdeling    string
+	NamaAfdeling    string
+	Luas            float64
+	IsActive        bool
+	ServerUpdatedAt *time.Time
+}
+
+// MasterBlokReference represents blok master data fetched from server.
+type MasterBlokReference struct {
+	KodeEstate      string
+	KodeAfdeling    string
+	KodeBlok        string
+	NamaBlok        string
+	Luas            float64
+	IsActive        bool
+	ServerUpdatedAt *time.Time
+}
+
+// MasterReferenceData is a server payload container for estate/afdeling/blok.
+type MasterReferenceData struct {
+	Estates   []MasterEstateReference
+	Afdelings []MasterAfdelingReference
+	Bloks     []MasterBlokReference
+}
+
+// FetchMasterReferenceData fetches Estate/Afdeling/Blok reference data from GraphQL server.
+func (c *GraphQLClient) FetchMasterReferenceData(ctx context.Context) (*MasterReferenceData, error) {
+	queries := []string{
+		`query FetchMasterReferenceData {
+			masterReferenceData {
+				estates {
+					kodeEstate
+					namaEstate
+					luas
+					lokasi
+					isActive
+					updatedAt
+				}
+				afdelings {
+					kodeEstate
+					kodeAfdeling
+					namaAfdeling
+					luas
+					isActive
+					updatedAt
+				}
+				bloks {
+					kodeEstate
+					kodeAfdeling
+					kodeBlok
+					namaBlok
+					luas
+					isActive
+					updatedAt
+				}
+			}
+		}`,
+		`query FetchMasterReferenceData {
+			master_reference_data {
+				estates {
+					kode_estate
+					nama_estate
+					luas
+					lokasi
+					is_active
+					updated_at
+				}
+				afdelings {
+					kode_estate
+					kode_afdeling
+					nama_afdeling
+					luas
+					is_active
+					updated_at
+				}
+				bloks {
+					kode_estate
+					kode_afdeling
+					kode_blok
+					nama_blok
+					luas
+					is_active
+					updated_at
+				}
+			}
+		}`,
+		`query FetchMasterReferenceData {
+			estates {
+				kodeEstate
+				namaEstate
+				luas
+				lokasi
+				isActive
+				updatedAt
+			}
+			afdelings {
+				kodeEstate
+				kodeAfdeling
+				namaAfdeling
+				luas
+				isActive
+				updatedAt
+			}
+			bloks {
+				kodeEstate
+				kodeAfdeling
+				kodeBlok
+				namaBlok
+				luas
+				isActive
+				updatedAt
+			}
+		}`,
+		`query FetchMasterReferenceData {
+			estates {
+				kode_estate
+				nama_estate
+				luas
+				lokasi
+				is_active
+				updated_at
+			}
+			afdelings {
+				kode_estate
+				kode_afdeling
+				nama_afdeling
+				luas
+				is_active
+				updated_at
+			}
+			bloks {
+				kode_estate
+				kode_afdeling
+				kode_blok
+				nama_blok
+				luas
+				is_active
+				updated_at
+			}
+		}`,
+	}
+
+	var lastErr error
+	for _, query := range queries {
+		result, err := c.fetchMasterReferenceDataWithQuery(ctx, query)
+		if err == nil {
+			return result, nil
+		}
+		lastErr = err
+	}
+
+	if lastErr == nil {
+		lastErr = fmt.Errorf("failed to fetch master reference data")
+	}
+	return nil, lastErr
+}
+
+func (c *GraphQLClient) fetchMasterReferenceDataWithQuery(ctx context.Context, query string) (*MasterReferenceData, error) {
+	gqlRequest := GraphQLRequest{Query: query}
+	requestBody, err := json.Marshal(gqlRequest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal master sync request: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.serverURL, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create master sync request: %w", err)
+	}
+
+	c.addAuthHeaders(req, string(requestBody))
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("master sync request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read master sync response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("server returned status %d: %s", resp.StatusCode, string(responseBody))
+	}
+
+	var gqlResponse GraphQLResponse
+	if err := json.Unmarshal(responseBody, &gqlResponse); err != nil {
+		return nil, fmt.Errorf("failed to parse master sync response: %w", err)
+	}
+
+	if len(gqlResponse.Errors) > 0 {
+		return nil, fmt.Errorf("GraphQL error: %s", gqlResponse.Errors[0].Message)
+	}
+
+	dataBytes, err := json.Marshal(gqlResponse.Data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal master sync payload: %w", err)
+	}
+
+	var payload map[string]interface{}
+	if err := json.Unmarshal(dataBytes, &payload); err != nil {
+		return nil, fmt.Errorf("failed to decode master sync payload: %w", err)
+	}
+
+	parsed, recognized, err := parseMasterReferenceDataPayload(payload)
+	if err != nil {
+		return nil, err
+	}
+	if !recognized {
+		return nil, fmt.Errorf("master reference payload not recognized")
+	}
+
+	return parsed, nil
+}
+
+func parseMasterReferenceDataPayload(payload map[string]interface{}) (*MasterReferenceData, bool, error) {
+	result := &MasterReferenceData{
+		Estates:   []MasterEstateReference{},
+		Afdelings: []MasterAfdelingReference{},
+		Bloks:     []MasterBlokReference{},
+	}
+
+	root := payload
+	recognized := false
+
+	if nested, ok := getMapByKeys(payload,
+		"masterReferenceData",
+		"master_reference_data",
+		"masterDataReference",
+		"master_data_reference",
+	); ok {
+		root = nested
+		recognized = true
+	}
+
+	if estatesRaw, ok := getSliceByKeys(root, "estates", "estate"); ok {
+		recognized = true
+		for _, item := range estatesRaw {
+			recordMap, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			result.Estates = append(result.Estates, MasterEstateReference{
+				KodeEstate:      getStringByKeys(recordMap, "kodeEstate", "kode_estate", "estateCode", "estate_code", "kode"),
+				NamaEstate:      getStringByKeys(recordMap, "namaEstate", "nama_estate", "estateName", "estate_name", "nama"),
+				Luas:            getFloatByKeys(recordMap, "luas", "area"),
+				Lokasi:          getStringByKeys(recordMap, "lokasi", "location"),
+				IsActive:        getBoolWithDefault(recordMap, true, "isActive", "is_active", "active"),
+				ServerUpdatedAt: getTimeByKeys(recordMap, "updatedAt", "updated_at", "serverUpdatedAt", "server_updated_at"),
+			})
+		}
+	}
+
+	if afdelingsRaw, ok := getSliceByKeys(root, "afdelings", "afdeling"); ok {
+		recognized = true
+		for _, item := range afdelingsRaw {
+			recordMap, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			result.Afdelings = append(result.Afdelings, MasterAfdelingReference{
+				KodeEstate:      getStringByKeys(recordMap, "kodeEstate", "kode_estate", "estateCode", "estate_code"),
+				KodeAfdeling:    getStringByKeys(recordMap, "kodeAfdeling", "kode_afdeling", "afdelingCode", "afdeling_code", "kode"),
+				NamaAfdeling:    getStringByKeys(recordMap, "namaAfdeling", "nama_afdeling", "afdelingName", "afdeling_name", "nama"),
+				Luas:            getFloatByKeys(recordMap, "luas", "area"),
+				IsActive:        getBoolWithDefault(recordMap, true, "isActive", "is_active", "active"),
+				ServerUpdatedAt: getTimeByKeys(recordMap, "updatedAt", "updated_at", "serverUpdatedAt", "server_updated_at"),
+			})
+		}
+	}
+
+	if bloksRaw, ok := getSliceByKeys(root, "bloks", "blok", "blocks"); ok {
+		recognized = true
+		for _, item := range bloksRaw {
+			recordMap, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			result.Bloks = append(result.Bloks, MasterBlokReference{
+				KodeEstate:      getStringByKeys(recordMap, "kodeEstate", "kode_estate", "estateCode", "estate_code"),
+				KodeAfdeling:    getStringByKeys(recordMap, "kodeAfdeling", "kode_afdeling", "afdelingCode", "afdeling_code"),
+				KodeBlok:        getStringByKeys(recordMap, "kodeBlok", "kode_blok", "blokCode", "blockCode", "block_code", "kode"),
+				NamaBlok:        getStringByKeys(recordMap, "namaBlok", "nama_blok", "blokName", "blockName", "block_name", "nama"),
+				Luas:            getFloatByKeys(recordMap, "luas", "area"),
+				IsActive:        getBoolWithDefault(recordMap, true, "isActive", "is_active", "active"),
+				ServerUpdatedAt: getTimeByKeys(recordMap, "updatedAt", "updated_at", "serverUpdatedAt", "server_updated_at"),
+			})
+		}
+	}
+
+	return result, recognized, nil
+}
+
+func getMapByKeys(input map[string]interface{}, keys ...string) (map[string]interface{}, bool) {
+	for _, key := range keys {
+		if value, ok := input[key]; ok {
+			if recordMap, ok := value.(map[string]interface{}); ok {
+				return recordMap, true
+			}
+		}
+	}
+	return nil, false
+}
+
+func getSliceByKeys(input map[string]interface{}, keys ...string) ([]interface{}, bool) {
+	for _, key := range keys {
+		if value, ok := input[key]; ok {
+			if records, ok := value.([]interface{}); ok {
+				return records, true
+			}
+		}
+	}
+	return nil, false
+}
+
+func getStringByKeys(input map[string]interface{}, keys ...string) string {
+	for _, key := range keys {
+		if value, ok := input[key]; ok {
+			switch typed := value.(type) {
+			case string:
+				return typed
+			}
+		}
+	}
+	return ""
+}
+
+func getFloatByKeys(input map[string]interface{}, keys ...string) float64 {
+	for _, key := range keys {
+		if value, ok := input[key]; ok {
+			switch typed := value.(type) {
+			case float64:
+				return typed
+			case float32:
+				return float64(typed)
+			case int:
+				return float64(typed)
+			case int64:
+				return float64(typed)
+			case json.Number:
+				parsed, err := typed.Float64()
+				if err == nil {
+					return parsed
+				}
+			}
+		}
+	}
+	return 0
+}
+
+func getBoolWithDefault(input map[string]interface{}, fallback bool, keys ...string) bool {
+	for _, key := range keys {
+		if value, ok := input[key]; ok {
+			switch typed := value.(type) {
+			case bool:
+				return typed
+			case string:
+				if typed == "true" || typed == "TRUE" || typed == "1" {
+					return true
+				}
+				if typed == "false" || typed == "FALSE" || typed == "0" {
+					return false
+				}
+			}
+		}
+	}
+	return fallback
+}
+
+func getTimeByKeys(input map[string]interface{}, keys ...string) *time.Time {
+	for _, key := range keys {
+		if value, ok := input[key]; ok {
+			switch typed := value.(type) {
+			case string:
+				if typed == "" {
+					return nil
+				}
+				if parsed, err := time.Parse(time.RFC3339, typed); err == nil {
+					return &parsed
+				}
+				if parsed, err := time.Parse(time.RFC3339Nano, typed); err == nil {
+					return &parsed
+				}
+			case float64:
+				unix := int64(typed)
+				parsed := time.Unix(unix, 0)
+				return &parsed
+			case int64:
+				parsed := time.Unix(typed, 0)
+				return &parsed
+			case time.Time:
+				parsed := typed
+				return &parsed
+			}
+		}
+	}
+	return nil
 }

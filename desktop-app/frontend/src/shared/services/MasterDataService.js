@@ -312,5 +312,32 @@ export class MasterDataService {
         await this.wails.DeleteBlok(String(id), userId)
         return true
     }
-}
 
+    // ========== MASTER DATA SYNC ==========
+
+    /**
+     * Trigger master-data sync from server.
+     * @param {Object} request - Sync request payload
+     * @returns {Promise<Object>} Sync result
+     */
+    async triggerMasterDataSync(request = {}) {
+        const payload = {
+            triggerSource: request.triggerSource || 'manual',
+            scope: Array.isArray(request.scope) && request.scope.length > 0
+                ? request.scope
+                : ['estate', 'afdeling', 'blok']
+        }
+
+        const result = await this.wails.TriggerMasterDataSync(JSON.stringify(payload))
+        return JSON.parse(result)
+    }
+
+    /**
+     * Get last master-data sync status.
+     * @returns {Promise<Object>} Sync status
+     */
+    async getMasterDataSyncStatus() {
+        const result = await this.wails.GetMasterDataSyncStatus()
+        return JSON.parse(result)
+    }
+}

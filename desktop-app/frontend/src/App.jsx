@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 // Feature imports
 import { LoginPage, LockScreen, useAuthStore } from './features/auth'
 // Shared imports
@@ -8,11 +8,13 @@ import useNavigationStore from './shared/store/useNavigationStore'
 import useGlobalWeightStore from './shared/store/useGlobalWeightStore'
 import { WailsProvider } from './shared/contexts/WailsContext'
 import { UserService } from './shared/services/UserService'
+import { MasterDataService } from './shared/services/MasterDataService'
 import LoadingScreen from './shared/components/LoadingScreen'
 import AppRouter from './shared/components/AppRouter'
 import useSessionTimeout from './shared/hooks/useSessionTimeout'
 // Import Wails wrapper
 import { getWailsWrapper } from './shared/lib/wailsWrapper'
+import usePKSStore, { clearPKSMasterDataCache } from './features/timbang1/store/usePKSStore'
 
 function App() {
   const {
@@ -44,6 +46,71 @@ function App() {
 
   // Create userService instance from wails when available
   const userService = useMemo(() => wails ? new UserService(wails) : null, [wails])
+  const masterDataService = useMemo(() => wails ? new MasterDataService(wails) : null, [wails])
+  const masterSyncIntervalRef = useRef(null)
+  const hasTriggeredMasterSyncRef = useRef(false)
+
+  const refreshMasterDataAfterSync = useCallback(async () => {
+    clearPKSMasterDataCache()
+
+    if (!masterDataService) {
+      return
+    }
+
+    try {
+      const pksStore = usePKSStore.getState()
+      if (typeof pksStore.fetchMasterDataWithCache === 'function') {
+        await pksStore.fetchMasterDataWithCache(masterDataService, true)
+      }
+    } catch (error) {
+      console.warn('Failed to refresh PKS master data after sync:', error?.message || error)
+    }
+  }, [masterDataService])
+
+  const triggerMasterDataSync = useCallback(async (triggerSource = 'auto') => {
+    if (!masterDataService) {
+      return null
+    }
+
+    try {
+      const result = await masterDataService.triggerMasterDataSync({
+        triggerSource,
+        scope: ['estate', 'afdeling', 'blok']
+      })
+
+      if (result?.success) {
+        await refreshMasterDataAfterSync()
+        window.dispatchEvent(new CustomEvent('master-data:sync-success', { detail: result }))
+      }
+
+      return result
+    } catch (error) {
+      console.warn('Master data auto-sync failed:', error?.message || error)
+      return null
+    }
+  }, [masterDataService, refreshMasterDataAfterSync])
+
+  const getMasterSyncIntervalMs = useCallback(async () => {
+    const fallback = 5 * 60 * 1000
+
+    try {
+      if (!wails || typeof wails.GetSystemSettings !== 'function') {
+        return fallback
+      }
+
+      const settingsJSON = await wails.GetSystemSettings()
+      const parsed = JSON.parse(settingsJSON)
+      const minutes = Number(parsed?.system?.syncInterval)
+
+      if (Number.isFinite(minutes) && minutes > 0) {
+        return Math.floor(minutes * 60 * 1000)
+      }
+    } catch (error) {
+      console.warn('Failed to resolve master sync interval from settings, using fallback 5 minutes')
+    }
+
+    return fallback
+  }, [wails])
 
   // Navigation handler
   const handleNavigation = useCallback((page) => {
@@ -134,6 +201,51 @@ function App() {
     }
   }, [isAuthenticated, user, servicesInitialized, isInitializingServices])
 
+  useEffect(() => {
+    const shouldRunMasterSync = Boolean(isAuthenticated && servicesInitialized && wails && masterDataService)
+
+    if (!shouldRunMasterSync) {
+      hasTriggeredMasterSyncRef.current = false
+      if (masterSyncIntervalRef.current) {
+        clearInterval(masterSyncIntervalRef.current)
+        masterSyncIntervalRef.current = null
+      }
+      return
+    }
+
+    let isCancelled = false
+
+    const setupMasterSyncLoop = async () => {
+      if (!hasTriggeredMasterSyncRef.current) {
+        hasTriggeredMasterSyncRef.current = true
+        await triggerMasterDataSync('auto')
+      }
+
+      const intervalMs = await getMasterSyncIntervalMs()
+      if (isCancelled) {
+        return
+      }
+
+      if (masterSyncIntervalRef.current) {
+        clearInterval(masterSyncIntervalRef.current)
+      }
+
+      masterSyncIntervalRef.current = setInterval(() => {
+        triggerMasterDataSync('auto')
+      }, intervalMs)
+    }
+
+    setupMasterSyncLoop()
+
+    return () => {
+      isCancelled = true
+      if (masterSyncIntervalRef.current) {
+        clearInterval(masterSyncIntervalRef.current)
+        masterSyncIntervalRef.current = null
+      }
+    }
+  }, [isAuthenticated, servicesInitialized, wails, masterDataService, triggerMasterDataSync, getMasterSyncIntervalMs])
+
   // Global weight monitoring - stays active across all pages
   useWeightMonitoring({
     wails,
@@ -220,3 +332,4 @@ function App() {
 }
 
 export default App
+

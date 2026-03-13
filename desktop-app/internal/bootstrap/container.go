@@ -42,6 +42,7 @@ type Container struct {
 	WeighingUseCase       *usecases.WeighingUseCase
 	UserManagementUseCase *usecases.UserManagementUseCase
 	SyncUseCase           *usecases.SyncUseCase
+	MasterDataSyncUseCase *usecases.MasterDataSyncUseCase
 	APIKeyUseCase         *usecases.APIKeyUseCase
 
 	// PKS Services
@@ -154,6 +155,10 @@ func (c *Container) initUseCases(deviceID string) {
 		nil, // AuditRepository - TODO: implement
 	)
 
+	if c.APIKeyRepository == nil {
+		c.APIKeyRepository = persistence.NewAPIKeyRepository(c.DB)
+	}
+
 	// Parse deviceID to UUID for sync client factory
 	deviceUUID, err := uuid.Parse(deviceID)
 	if err != nil {
@@ -172,6 +177,8 @@ func (c *Container) initUseCases(deviceID string) {
 		nil, // DeviceRepository - TODO: implement
 		clientFactory,
 	)
+
+	c.MasterDataSyncUseCase = usecases.NewMasterDataSyncUseCase(c.DB, clientFactory)
 }
 
 // initPKSServices initializes all PKS service implementations
@@ -261,7 +268,7 @@ func (c *Container) initControllers() {
 	c.UserController = controllers.NewUserController(c.AuthService)
 	c.SyncController = controllers.NewSyncController(c.SyncUseCase)
 	c.PKSController = controllers.NewPKSController(c.PKSService)
-	c.PKSMasterController = controllers.NewPKSMasterController(c.PKSMasterService)
+	c.PKSMasterController = controllers.NewPKSMasterController(c.PKSMasterService, c.MasterDataSyncUseCase)
 	c.PKSReportController = controllers.NewPKSReportController(c.PKSReportService, c.ExcelExportService)
 	c.WeightMonitoringController = controllers.NewWeightMonitoringController(c.WeightMonitoringService)
 	c.TicketController = controllers.NewTicketController(c.TicketService)
@@ -274,6 +281,10 @@ func (c *Container) initUseCasesForRole(deviceID string, userRole string) {
 		c.UserRepository,
 		nil, // AuditRepository - TODO: implement
 	)
+
+	if c.APIKeyRepository == nil {
+		c.APIKeyRepository = persistence.NewAPIKeyRepository(c.DB)
+	}
 
 	// Parse deviceID to UUID for sync client factory
 	deviceUUID, err := uuid.Parse(deviceID)
@@ -294,6 +305,8 @@ func (c *Container) initUseCasesForRole(deviceID string, userRole string) {
 		nil, // DeviceRepository - TODO: implement
 		clientFactory,
 	)
+
+	c.MasterDataSyncUseCase = usecases.NewMasterDataSyncUseCase(c.DB, clientFactory)
 
 	// Weighing use case is only available for roles that need it
 	if c.isWeighingRole(userRole) {
@@ -386,7 +399,7 @@ func (c *Container) initControllersWithContextAndRole(ctx context.Context, userR
 	c.UserController = controllers.NewUserController(c.AuthService)
 	c.SyncController = controllers.NewSyncController(c.SyncUseCase)
 	c.PKSController = controllers.NewPKSController(c.PKSService)
-	c.PKSMasterController = controllers.NewPKSMasterController(c.PKSMasterService)
+	c.PKSMasterController = controllers.NewPKSMasterController(c.PKSMasterService, c.MasterDataSyncUseCase)
 	c.PKSReportController = controllers.NewPKSReportController(c.PKSReportService, c.ExcelExportService)
 	c.TicketController = controllers.NewTicketController(c.TicketService)
 

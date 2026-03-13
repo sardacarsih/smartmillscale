@@ -7,19 +7,22 @@ import (
 	"strconv"
 
 	"github.com/google/uuid"
-
+	"github.com/yourusername/gosmartmillscale/desktop-app/internal/application/dto"
+	"github.com/yourusername/gosmartmillscale/desktop-app/internal/application/usecases"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/service"
 )
 
 // PKSMasterController handles PKS master data operations
 type PKSMasterController struct {
-	masterService *service.PKSMasterService
+	masterService     *service.PKSMasterService
+	masterSyncUseCase *usecases.MasterDataSyncUseCase
 }
 
 // NewPKSMasterController creates a new PKS master controller
-func NewPKSMasterController(masterService *service.PKSMasterService) *PKSMasterController {
+func NewPKSMasterController(masterService *service.PKSMasterService, masterSyncUseCase *usecases.MasterDataSyncUseCase) *PKSMasterController {
 	return &PKSMasterController{
-		masterService: masterService,
+		masterService:     masterService,
+		masterSyncUseCase: masterSyncUseCase,
 	}
 }
 
@@ -581,4 +584,39 @@ func (c *PKSMasterController) DeleteBlok(blokID string, deleterID string) error 
 
 	// Delete block
 	return c.masterService.DeleteBlok(context.Background(), uint(id))
+}
+
+// TriggerMasterDataSync triggers master-data synchronization (estate/afdeling/blok).
+func (c *PKSMasterController) TriggerMasterDataSync(requestJSON string) (interface{}, error) {
+	if c.masterSyncUseCase == nil {
+		return nil, fmt.Errorf("master data sync use case is not initialized")
+	}
+
+	req := &dto.MasterDataSyncRequest{}
+	if requestJSON != "" {
+		if err := json.Unmarshal([]byte(requestJSON), req); err != nil {
+			return nil, fmt.Errorf("invalid request format: %w", err)
+		}
+	}
+
+	result, err := c.masterSyncUseCase.TriggerMasterDataSync(context.Background(), req)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// GetMasterDataSyncStatus returns latest master-data sync status.
+func (c *PKSMasterController) GetMasterDataSyncStatus() (interface{}, error) {
+	if c.masterSyncUseCase == nil {
+		return nil, fmt.Errorf("master data sync use case is not initialized")
+	}
+
+	status, err := c.masterSyncUseCase.GetMasterDataSyncStatus(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	return status, nil
 }

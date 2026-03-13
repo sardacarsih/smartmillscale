@@ -27,6 +27,8 @@ const DataTable = ({
   onRowClick,
   onEdit,
   onDelete,
+  canEdit,
+  canDelete,
   selectedRows = [],
   onSelectionChange,
   selectable = false,
@@ -248,9 +250,16 @@ const DataTable = ({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
+                              if (canEdit && !canEdit(item)) {
+                                return;
+                              }
                               onEdit(item);
                             }}
-                            className="text-blue-600 hover:text-blue-900 font-medium"
+                            disabled={Boolean(canEdit && !canEdit(item))}
+                            className={`font-medium ${canEdit && !canEdit(item)
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-blue-600 hover:text-blue-900'
+                              }`}
                           >
                             Edit
                           </button>
@@ -262,9 +271,16 @@ const DataTable = ({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
+                              if (canDelete && !canDelete(item)) {
+                                return;
+                              }
                               onDelete(item);
                             }}
-                            className="text-red-600 hover:text-red-900 font-medium"
+                            disabled={Boolean(canDelete && !canDelete(item))}
+                            className={`font-medium ${canDelete && !canDelete(item)
+                              ? 'text-gray-400 cursor-not-allowed'
+                              : 'text-red-600 hover:text-red-900'
+                              }`}
                           >
                             Delete
                           </button>

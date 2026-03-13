@@ -183,20 +183,12 @@ const useSettingsStore = create(
 
           return { success: true }
         } catch (error) {
-          const merged = mergeWithDefaults()
+          const message = error?.message || 'Gagal memuat pengaturan dari database'
           set({
-            ...merged,
-            settings: {
-              general: merged.generalSettings,
-              system: merged.systemSettings,
-              serial: merged.serialSettings,
-              security: merged.securitySettings,
-              company: merged.companySettings
-            },
             isLoading: false,
-            hasChanges: false
+            error: message
           })
-          return { success: true }
+          return { success: false, error: message }
         }
       },
 

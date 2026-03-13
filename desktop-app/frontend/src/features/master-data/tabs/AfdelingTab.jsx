@@ -12,7 +12,7 @@ import { clearPKSMasterDataCache } from '../../timbang1/store/usePKSStore';
  * Manages Afdeling master data with full CRUD operations
  */
 
-const AfdelingTab = () => {
+const AfdelingTab = ({ syncRefreshToken = 0 }) => {
   // Services and Auth
   const masterDataService = useWailsService('masterData');
   const { user } = useAuthStore();
@@ -53,6 +53,18 @@ const AfdelingTab = () => {
     { key: 'estate.nama_estate', title: 'Estate', width: '180', sortable: true, render: (value, row) => row.estate?.nama_estate || '-' },
     { key: 'luas', title: 'Luas (Ha)', width: '120', sortable: true, render: (value) => value ? `${parseFloat(value).toLocaleString()}` : '-' },
     {
+    {
+      key: 'data_source', title: 'Sumber', width: '110', sortable: true,
+      render: (value) => {
+        const source = String(value || 'MANUAL').toUpperCase();
+        const isServer = source === 'SERVER';
+        return (
+          <span className={inline-flex px-2 py-1 text-xs font-semibold rounded-full }>
+            {source}
+          </span>
+        );
+      }
+    },
       key: 'is_active', title: 'Status', width: '100', sortable: true,
       render: (value) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
@@ -240,6 +252,13 @@ const AfdelingTab = () => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (syncRefreshToken > 0) {
+      loadEstates();
+      loadData();
+    }
+  }, [syncRefreshToken]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -272,6 +291,8 @@ const AfdelingTab = () => {
         onPageChange={(page) => loadData()}
         onEdit={(item) => openModal('edit', item)}
         onDelete={(item) => openModal('delete', item)}
+        canEdit={(item) => String(item?.data_source || 'MANUAL').toUpperCase() !== 'SERVER'}
+        canDelete={(item) => String(item?.data_source || 'MANUAL').toUpperCase() !== 'SERVER'}
         selectable={false}
         actions={true}
       />

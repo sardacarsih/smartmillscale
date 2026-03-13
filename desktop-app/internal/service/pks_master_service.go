@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -56,6 +57,10 @@ func NewPKSMasterService(db *gorm.DB) *PKSMasterService {
 // SetCurrentUser sets the current user for the service operations
 func (s *PKSMasterService) SetCurrentUser(userID uuid.UUID) {
 	s.currentUser = userID
+}
+
+func isServerMasterRecord(source string) bool {
+	return strings.EqualFold(strings.TrimSpace(source), database.MasterDataSourceServer)
 }
 
 // === Product Operations ===
@@ -573,6 +578,7 @@ func (s *PKSMasterService) CreateEstate(ctx context.Context, req *CreateEstateRe
 		Luas:       req.Luas,
 		Lokasi:     req.Lokasi,
 		IsActive:   true,
+		DataSource: database.MasterDataSourceManual,
 	}
 
 	if err := s.db.WithContext(ctx).Create(estate).Error; err != nil {
@@ -605,6 +611,10 @@ func (s *PKSMasterService) UpdateEstate(ctx context.Context, id uint, req *Updat
 		return nil, fmt.Errorf("estate not found: %w", err)
 	}
 
+	if isServerMasterRecord(estate.DataSource) {
+		return nil, fmt.Errorf("estate sumber server bersifat read-only di lokal")
+	}
+
 	// Update fields
 	estate.NamaEstate = req.NamaEstate
 	estate.Luas = req.Luas
@@ -624,6 +634,14 @@ func (s *PKSMasterService) UpdateEstate(ctx context.Context, id uint, req *Updat
 
 // DeleteEstate soft deletes an estate
 func (s *PKSMasterService) DeleteEstate(ctx context.Context, id uint) error {
+	var estate database.MasterEstate
+	if err := s.db.WithContext(ctx).First(&estate, id).Error; err != nil {
+		return fmt.Errorf("estate not found: %w", err)
+	}
+	if isServerMasterRecord(estate.DataSource) {
+		return fmt.Errorf("estate sumber server bersifat read-only di lokal")
+	}
+
 	// Check if estate is in use (e.g. has afdelings)
 	var count int64
 	if err := s.db.WithContext(ctx).Model(&database.MasterAfdeling{}).Where("id_estate = ?", id).Count(&count).Error; err != nil {
@@ -753,6 +771,7 @@ func (s *PKSMasterService) CreateAfdeling(ctx context.Context, req *CreateAfdeli
 		NamaAfdeling: req.NamaAfdeling,
 		Luas:         req.Luas,
 		IsActive:     true,
+		DataSource:   database.MasterDataSourceManual,
 	}
 
 	if err := s.db.WithContext(ctx).Create(afdeling).Error; err != nil {
@@ -806,6 +825,10 @@ func (s *PKSMasterService) UpdateAfdeling(ctx context.Context, id uint, req *Upd
 		return nil, fmt.Errorf("afdeling not found: %w", err)
 	}
 
+	if isServerMasterRecord(afdeling.DataSource) {
+		return nil, fmt.Errorf("afdeling sumber server bersifat read-only di lokal")
+	}
+
 	// Update fields
 	afdeling.NamaAfdeling = req.NamaAfdeling
 	afdeling.Luas = req.Luas
@@ -827,6 +850,14 @@ func (s *PKSMasterService) UpdateAfdeling(ctx context.Context, id uint, req *Upd
 
 // DeleteAfdeling soft deletes an afdeling
 func (s *PKSMasterService) DeleteAfdeling(ctx context.Context, id uint) error {
+	var afdeling database.MasterAfdeling
+	if err := s.db.WithContext(ctx).First(&afdeling, id).Error; err != nil {
+		return fmt.Errorf("afdeling not found: %w", err)
+	}
+	if isServerMasterRecord(afdeling.DataSource) {
+		return fmt.Errorf("afdeling sumber server bersifat read-only di lokal")
+	}
+
 	// Check if afdeling is in use (e.g. has blocks)
 	var count int64
 	if err := s.db.WithContext(ctx).Model(&database.MasterBlok{}).Where("id_afdeling = ?", id).Count(&count).Error; err != nil {
@@ -960,6 +991,7 @@ func (s *PKSMasterService) CreateBlok(ctx context.Context, req *CreateBlokReques
 		NamaBlok:   req.NamaBlok,
 		Luas:       req.Luas,
 		IsActive:   true,
+		DataSource: database.MasterDataSourceManual,
 	}
 
 	if err := s.db.WithContext(ctx).Create(blok).Error; err != nil {
@@ -1013,6 +1045,10 @@ func (s *PKSMasterService) UpdateBlok(ctx context.Context, id uint, req *UpdateB
 		return nil, fmt.Errorf("block not found: %w", err)
 	}
 
+	if isServerMasterRecord(blok.DataSource) {
+		return nil, fmt.Errorf("blok sumber server bersifat read-only di lokal")
+	}
+
 	// Update fields
 	blok.NamaBlok = req.NamaBlok
 	blok.Luas = req.Luas
@@ -1034,6 +1070,14 @@ func (s *PKSMasterService) UpdateBlok(ctx context.Context, id uint, req *UpdateB
 
 // DeleteBlok soft deletes a block
 func (s *PKSMasterService) DeleteBlok(ctx context.Context, id uint) error {
+	var blok database.MasterBlok
+	if err := s.db.WithContext(ctx).First(&blok, id).Error; err != nil {
+		return fmt.Errorf("block not found: %w", err)
+	}
+	if isServerMasterRecord(blok.DataSource) {
+		return fmt.Errorf("blok sumber server bersifat read-only di lokal")
+	}
+
 	// Check if block is in use in transactions
 	var count int64
 	if err := s.db.WithContext(ctx).Model(&database.TimbanganPKS{}).Where("id_blok = ?", id).Count(&count).Error; err != nil {

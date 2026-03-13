@@ -103,7 +103,7 @@ func getAppDataPath() string {
 	// Use the same logic as getWindowsDatabasePath but for the base directory
 	if runtime.GOOS == "windows" {
 		path := getWindowsDatabasePath()
-		return filepath.Dir(filepath.Dir(path)) // Go up two levels from .../data/smartmill.db
+		return filepath.Dir(filepath.Dir(path)) // Go up two levels from .../data/smartmillscale.db
 	}
 
 	homeDir, err := os.UserHomeDir()
@@ -136,7 +136,7 @@ func getDatabasePath() string {
 	if isPortableMode() {
 		exePath, err := os.Executable()
 		if err == nil {
-			portableDBPath := filepath.Join(filepath.Dir(exePath), "data", "smartmill.db")
+			portableDBPath := filepath.Join(filepath.Dir(exePath), "data", "smartmillscale.db")
 			return portableDBPath
 		}
 	}
@@ -151,7 +151,7 @@ func getDatabasePath() string {
 	if err != nil {
 		cwd = "."
 	}
-	return filepath.Join(cwd, "data", "smartmill.db")
+	return filepath.Join(cwd, "data", "smartmillscale.db")
 }
 
 // getWindowsDatabasePath determines the best database path on Windows
@@ -160,23 +160,23 @@ func getWindowsDatabasePath() string {
 
 	// Primary: %LOCALAPPDATA%
 	if localAppData := os.Getenv("LOCALAPPDATA"); localAppData != "" {
-		paths = append(paths, filepath.Join(localAppData, "SmartMillScale", "data", "smartmill.db"))
+		paths = append(paths, filepath.Join(localAppData, "SmartMillScale", "data", "smartmillscale.db"))
 	}
 
 	// Secondary: %USERPROFILE%\AppData\Local
 	if userProfile := os.Getenv("USERPROFILE"); userProfile != "" {
-		paths = append(paths, filepath.Join(userProfile, "AppData", "Local", "SmartMillScale", "data", "smartmill.db"))
+		paths = append(paths, filepath.Join(userProfile, "AppData", "Local", "SmartMillScale", "data", "smartmillscale.db"))
 	}
 
 	// Tertiary: %TEMP% (as last resort)
 	if tempDir := os.Getenv("TEMP"); tempDir != "" {
-		paths = append(paths, filepath.Join(tempDir, "SmartMillScale", "data", "smartmill.db"))
+		paths = append(paths, filepath.Join(tempDir, "SmartMillScale", "data", "smartmillscale.db"))
 	}
 
 	// Quaternary: Current working directory
 	cwd, err := os.Getwd()
 	if err == nil {
-		paths = append(paths, filepath.Join(cwd, "data", "smartmill.db"))
+		paths = append(paths, filepath.Join(cwd, "data", "smartmillscale.db"))
 	}
 
 	// Find the first writable path
@@ -192,7 +192,7 @@ func getWindowsDatabasePath() string {
 	}
 
 	// Ultimate fallback
-	return "./data/smartmill.db"
+	return "./data/smartmillscale.db"
 }
 
 // isPathWritable checks if a path is writable by attempting to create directories

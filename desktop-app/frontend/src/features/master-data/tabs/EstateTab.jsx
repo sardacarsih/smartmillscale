@@ -12,7 +12,7 @@ import { clearPKSMasterDataCache } from '../../timbang1/store/usePKSStore';
  * Manages Estate master data with full CRUD operations
  */
 
-const EstateTab = () => {
+const EstateTab = ({ syncRefreshToken = 0 }) => {
   // Services and Auth
   const masterDataService = useWailsService('masterData');
   const { user } = useAuthStore();
@@ -77,6 +77,24 @@ const EstateTab = () => {
           {value || '-'}
         </div>
       )
+    },
+    {
+      key: 'data_source',
+      title: 'Sumber',
+      width: '110',
+      sortable: true,
+      render: (value) => {
+        const source = String(value || 'MANUAL').toUpperCase();
+        const isServer = source === 'SERVER';
+        return (
+          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${isServer
+            ? 'bg-blue-100 text-blue-800'
+            : 'bg-amber-100 text-amber-800'
+            }`}>
+            {source}
+          </span>
+        );
+      }
     },
     {
       key: 'is_active',
@@ -331,6 +349,12 @@ const EstateTab = () => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (syncRefreshToken > 0) {
+      loadData(pagination.page, search);
+    }
+  }, [syncRefreshToken]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -366,6 +390,8 @@ const EstateTab = () => {
         onPageChange={handlePageChange}
         onEdit={handleEdit}
         onDelete={handleDeleteClick}
+        canEdit={(item) => String(item?.data_source || 'MANUAL').toUpperCase() !== 'SERVER'}
+        canDelete={(item) => String(item?.data_source || 'MANUAL').toUpperCase() !== 'SERVER'}
         selectable={false}
         actions={true}
       />
