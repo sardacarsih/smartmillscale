@@ -1,0 +1,514 @@
+
+> smart-mill-scale-frontend@0.1.0 test
+> vitest src/App.test.jsx
+
+
+[1m[44m DEV [49m[22m [34mv4.0.13 [39m[90mE:/gosmartmillscale/desktop-app/frontend[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 01:48:42
+[2m   Duration [22m 1.73s[2m (transform 306ms, setup 33ms, collect 629ms, tests 97ms, environment 765ms, prepare 13ms)[22m
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mwailsjs/runtime/package.json [22m[34mx1 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[32m 238[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 01:56:07
+[2m   Duration [22m 1.25s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mwailsjs/runtime/package.json [22m[34mx2 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[33m 427[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 01:56:12
+[2m   Duration [22m 1.38s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mwailsjs/runtime/package.json [22m[34mx3 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[32m 277[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 01:56:27
+[2m   Duration [22m 2.35s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mwailsjs/runtime/runtime.js [22m[34mx4 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[32m 279[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 01:56:37
+[2m   Duration [22m 2.67s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/features/timbang1/components/PKSWeighingForm.jsx [22m[34mx5 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[33m 363[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 02:01:31
+[2m   Duration [22m 2.08s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2msrc/shared/contexts/WailsContext.jsx [22m[34mx6 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[32m 218[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 02:01:39
+[2m   Duration [22m 2.38s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mwailsjs/runtime/package.json [22m[34mx7 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[33m 469[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 02:04:46
+[2m   Duration [22m 2.66s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mwailsjs/runtime/runtime.js [22m[34mx8 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[32m 245[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 02:05:32
+[2m   Duration [22m 1.97s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mwailsjs/runtime/package.json [22m[34mx9 [34m[39m
+       [2m Filename pattern: [22m[34msrc/App.test.jsx[39m
+
+stderr | src/App.test.jsx > App Component > Login Flow > renders LoginPage when not authenticated
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Login Flow > shows loading spinner when isLoading is true
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+stderr | src/App.test.jsx > App Component > Logout Flow > calls stopMonitoring on logout
+Trace: ­ƒöÆ [App] Stop called from logout effect
+    at E:/gosmartmillscale/desktop-app/frontend/src/App.jsx:236:15
+    at commitHookEffectListMount (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:23189:26)
+    at commitPassiveMountOnFiber (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24970:11)
+    at commitPassiveMountEffects_complete (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24930:9)
+    at commitPassiveMountEffects_begin (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24917:7)
+    at commitPassiveMountEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:24905:3)
+    at flushPassiveEffectsImpl (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27078:3)
+    at flushPassiveEffects (E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:27023:14)
+    at E:\gosmartmillscale\desktop-app\frontend\node_modules\react-dom\cjs\react-dom.development.js:26808:9
+    at flushActQueue (E:\gosmartmillscale\desktop-app\frontend\node_modules\react\cjs\react.development.js:2667:24)
+
+ [32mÔ£ô[39m src/App.test.jsx [2m([22m[2m8 tests[22m[2m)[22m[33m 393[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 02:05:38
+[2m   Duration [22m 2.22s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m

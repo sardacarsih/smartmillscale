@@ -1,0 +1,25 @@
+Analisis project saya yang sudah ada (berdasarkan file, folder, dan kode ) lalu buatkan diagram workflow login yang akurat sesuai implementasi nyata.
+
+Diagram harus dibuat berdasarkan kode asli pada project ini, bukan berdasarkan asumsi.
+
+Berikan output berikut:
+
+Diagram alur login (flowchart) dari frontend → backend → database (SQLite).
+
+Sequence diagram yang menggambarkan interaksi antara Vite (frontend), Wails (bridge), Go backend, dan SQLite.
+
+Penjelasan setiap step login berdasarkan kode nyata di project.
+
+Jika ada kekurangan atau potensi bug dalam workflow login di project ini, tunjukkan dan berikan saran perbaikan.
+
+Fokus pada:
+
+bagaimana frontend memanggil backend melalui Wails binding
+
+bagaimana backend Go memproses login
+
+bagaimana SQLite digunakan untuk validasi user
+
+flow autentikasi yang benar-benar dilakukan oleh kode existing
+
+Jangan membuat asumsi — seluruh diagram harus sesuai dengan project yang saya berikan.

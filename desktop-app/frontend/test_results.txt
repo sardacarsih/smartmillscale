@@ -1,0 +1,55 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.10 [39m[90mE:/gosmartmillscale/desktop-app/frontend[39m
+
+ [32mÔ£ô[39m src/shared/store/useGlobalWeightStore.test.js[2m > [22museGlobalWeightStore - Penyimpanan Berat Global[2m > [22mState Awal[2m > [22mharus memiliki state awal yang benar[32m 6[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/store/useGlobalWeightStore.test.js[2m > [22museGlobalWeightStore - Penyimpanan Berat Global[2m > [22mKunci Persistence[2m > [22mharus mengizinkan pengaturan flag persistence[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/store/useGlobalWeightStore.test.js[2m > [22museGlobalWeightStore - Penyimpanan Berat Global[2m > [22mKunci Persistence[2m > [22mharus mencegah stop ketika persistence terkunci[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/store/useGlobalWeightStore.test.js[2m > [22museGlobalWeightStore - Penyimpanan Berat Global[2m > [22mKunci Persistence[2m > [22mharus mengizinkan stop dengan flag force meskipun persistent[32m 2[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/store/useGlobalWeightStore.test.js[2m > [22museGlobalWeightStore - Penyimpanan Berat Global[2m > [22mSistem Izin[2m > [22mharus memberikan semua izin kepada ADMIN[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/store/useGlobalWeightStore.test.js[2m > [22museGlobalWeightStore - Penyimpanan Berat Global[2m > [22mSistem Izin[2m > [22mharus menolak izin kontrol untuk GRADING[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mInitial State[2m > [22mshould have correct initial state[32m 3[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould login successfully with valid credentials[32m 4[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle string JSON response from backend[32m 2[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle object response from backend[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle invalid credentials error[32m 3[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle user not found error[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle user inactive error[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle invalid response format[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle database connection not available[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogin Function[2m > [22mshould handle JSON parsing errors[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogout Function[2m > [22mshould logout successfully[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mLogout Function[2m > [22mshould handle logout errors gracefully[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mCheckSession Function[2m > [22mshould check session successfully[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mCheckSession Function[2m > [22mshould handle invalid session[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mCheckSession Function[2m > [22mshould handle database connection not available[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mError Handling[2m > [22mshould set error with details[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mError Handling[2m > [22mshould clear error[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mSession Management[2m > [22mshould update activity timestamp[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mSession Management[2m > [22mshould update activity timestamp using alias method[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mSession Management[2m > [22mshould force logout without backend call[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mSetup Management[2m > [22mshould set setup required status[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mSetup Management[2m > [22mshould check setup requirement[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m src/features/auth/store/useAuthStore.test.js[2m > [22museAuthStore[2m > [22mSetup Management[2m > [22mshould handle database connection not available for setup check[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mInisialisasi Hook[2m > [22mharus menginisialisasi tanpa error[32m 28[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mInisialisasi Hook[2m > [22mharus memulai monitoring otomatis ketika autoStart true[32m 77[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mInisialisasi Hook[2m > [22mtidak boleh memulai otomatis ketika autoStart false[32m 4[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mautoCleanup: false (Bertahan Saat Navigasi)[2m > [22mTIDAK boleh stop monitoring saat unmount ketika autoCleanup=false[32m 182[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mautoCleanup: false (Bertahan Saat Navigasi)[2m > [22mhanya boleh unsubscribe dari store saat unmount ketika autoCleanup=false[32m 91[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mautoCleanup: true (Stop Saat Unmount)[2m > [22mharus stop monitoring saat unmount ketika autoCleanup=true[32m 99[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mPerbaikan Dependency Array[2m > [22mtidak boleh re-initialize ketika monitoring state berubah[32m 116[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mPerbaikan Dependency Array[2m > [22mharus re-initialize hanya ketika konfigurasi berubah[32m 5[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mMetode Kontrol[2m > [22mharus mengizinkan start manual[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mMetode Kontrol[2m > [22mharus mengizinkan stop manual[32m 97[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mMetode Kontrol[2m > [22mharus menghormati izin role untuk kontrol[32m 4[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mEkspose State[2m > [22mharus mengekspose state monitoring[32m 13[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mEkspose State[2m > [22mharus mengekspose analytics untuk role yang berwenang[32m 3[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mEkspose State[2m > [22mharus menunjukkan tidak ada akses analytics untuk role yang tidak berwenang[32m 3[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mCallbacks[2m > [22mharus memanggil callback onWeightChange[32m 85[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mCallbacks[2m > [22mharus memanggil callback onConnectionChange[32m 79[2mms[22m[39m
+ [32mÔ£ô[39m src/shared/hooks/useWeightMonitoring.test.js[2m > [22museWeightMonitoring Hook - Pengawasan Berat[2m > [22mCallbacks[2m > [22mharus memanggil callback onStabilityChange[32m 86[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[32m46 passed[39m[22m[90m (46)[39m
+[2m   Start at [22m 13:04:58
+[2m   Duration [22m 2.68s[2m (transform 264ms, setup 117ms, collect 536ms, tests 1.03s, environment 3.24s, prepare 52ms)[22m
+

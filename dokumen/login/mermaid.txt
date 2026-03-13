@@ -1,0 +1,36 @@
+flowchart TD
+    subgraph Frontend [Vite / React Frontend]
+        A[User Input Username & Password] --> B[LoginPage.jsx: handleSubmit]
+        B --> C[useAuthStore.js: login]
+        C --> D[UserService.js: login]
+        D -->|Panggil Wails Binding| E[window.go.main.App.Login]
+    end
+    subgraph Bridge [Wails Bridge]
+        E -->|JSON Marshaling| F[Go Runtime]
+    end
+    subgraph Backend [Go Backend]
+        F --> G[app_user.go: Login]
+        G --> H[CoreApplication.AuthService.Login]
+        
+        H --> L{"Validasi Input"}
+        L -- Invalid --> M[Return Error]
+        L -- Valid --> N[Query User ke DB]
+    end
+    subgraph Database [SQLite DB]
+        N --> O[(users table)]
+        O -->|Return User Data| P[AuthService]
+    end
+    subgraph Validation [Verifikasi]
+        P --> Q{"User Found & Active?"}
+        Q -- No --> R[Return Error]
+        Q -- Yes --> S{"Verify Password (Bcrypt)"}
+        S -- No --> T[Return Error]
+        S -- Yes --> U[Generate Session]
+        U --> V[Audit Log: LOGIN_SUCCESS]
+        V --> W[InitializeAuthenticatedServices]
+        W --> X[Return Success JSON]
+    end
+    X -->|Response| D
+    M -->|Error| D
+    R -->|Error| D
+    T -->|Error| D

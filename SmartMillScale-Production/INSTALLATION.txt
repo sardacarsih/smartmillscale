@@ -1,0 +1,37 @@
+SMART MILL SCALE - QUICK INSTALLATION GUIDE
+==========================================
+
+OPTION 1: PORTABLE MODE (Recommended for testing)
+1. Extract all files to any folder
+2. Double-click "Smart Mill Scale.exe" to run
+3. Database will be created automatically
+
+OPTION 2: SYSTEM INSTALLATION
+1. Right-click "install.bat" and select "Run as administrator"
+2. Follow the installation prompts
+3. Launch from Start Menu or Desktop shortcut
+
+DEFAULT LOGIN:
+- Username: admin      Password: admin123
+- Username: supervisor Password: supervisor123
+- Username: operator   Password: operator123
+- Username: grading    Password: grading123
+
+⚠️  IMPORTANT: Change default passwords after first login!
+
+REQUIREMENTS:
+- Windows 10/11 (64-bit)
+- 4GB RAM minimum
+- 100MB free space
+
+TROUBLESHOOTING:
+- Run as Administrator if permission errors occur
+- Check Windows Firewall for network access
+- Ensure antivirus doesn't block the application
+
+SUPPORT:
+- Email: support@smartmillscale.com
+- Documentation: See README.md
+
+Version 1.0.0
+© 2025 Smart Mill Scale

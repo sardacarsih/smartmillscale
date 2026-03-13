@@ -1,0 +1,19 @@
+entities:
+  - name: Produk
+    plural: products
+    service_method: Produk
+  - name: Unit
+    plural: units
+    service_method: Unit
+  - name: Supplier
+    plural: suppliers
+    service_method: Supplier
+  - name: Estate
+    plural: estates
+    service_method: Estate
+  - name: Afdeling
+    plural: afdelings
+    service_method: Afdeling
+  - name: Blok
+    plural: bloks
+    service_method: Blok

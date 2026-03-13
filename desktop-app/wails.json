@@ -1,0 +1,39 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "Smart Mill Scale",
+  "author": {
+    "name": "Smart Mill Scale Team",
+    "email": "dev@smartmillscale.com"
+  },
+  "info": {
+    "companyName": "Smart Mill Scale",
+    "productName": "Smart Mill Scale",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2025 Smart Mill Scale",
+    "comments": "Offline Weighing Scale Application"
+  },
+  "frontend": {
+    "dir": "./frontend",
+    "install": "npm install",
+    "build": "npm run build",
+    "dev:watcher": "npm run dev",
+    "package": {
+      "manager": "npm"
+    }
+  },
+  "backend": {
+    "dir": "."
+  },
+  "nsisType": "multiple",
+  "obfuscated": false,
+  "garbleargs": "",
+  "upx": false,
+  "upxflags": "",
+  "runNonNativeBuildHooks": false,
+  "args": "",
+  "frontendDevServerURL": "http://localhost:5173",
+  "assetdir": "./frontend/dist",
+  "reloaddirs": "./frontend/src,./internal",
+  "builddir": "./build",
+  "debounce": 500
+}

@@ -1,0 +1,4 @@
+# This file enables portable mode
+# In portable mode, the application stores data and configuration
+# in the same directory as the executable
+# Remove this file to use system-wide installation mode
