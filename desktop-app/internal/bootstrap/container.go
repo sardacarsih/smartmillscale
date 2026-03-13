@@ -182,6 +182,9 @@ func (c *Container) initPKSServices(deviceID string, ctx context.Context) {
 	c.ExcelExportService = service.NewExcelExportService()
 	c.WeightMonitoringService = service.NewWeightMonitoringService(c.DB, ctx)
 	c.TicketService = service.NewTicketService(c.DB)
+	if c.AppConfig != nil {
+		c.TicketService.SetCompanyConfig(&c.AppConfig.Company)
+	}
 }
 
 // initPKSServicesWithConfig initializes all PKS services with configuration
@@ -192,6 +195,9 @@ func (c *Container) initPKSServicesWithConfig(deviceID string, ctx context.Conte
 	c.ExcelExportService = service.NewExcelExportService()
 	c.WeightMonitoringService = service.NewWeightMonitoringService(c.DB, ctx)
 	c.TicketService = service.NewTicketService(c.DB)
+	if c.AppConfig != nil {
+		c.TicketService.SetCompanyConfig(&c.AppConfig.Company)
+	}
 
 	// Create and configure serial reader based on configuration
 	if c.AppConfig != nil {
@@ -308,6 +314,9 @@ func (c *Container) initPKSServicesWithConfigAndRole(deviceID string, ctx contex
 	c.PKSReportService = service.NewPKSReportService(c.DB, deviceID)
 	c.ExcelExportService = service.NewExcelExportService()
 	c.TicketService = service.NewTicketService(c.DB)
+	if c.AppConfig != nil {
+		c.TicketService.SetCompanyConfig(&c.AppConfig.Company)
+	}
 
 	// Weight monitoring service is only initialized for roles that need it
 	// This prevents serial port connection for users who don't need weighing functionality

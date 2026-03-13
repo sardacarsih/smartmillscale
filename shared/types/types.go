@@ -180,6 +180,18 @@ func DefaultSyncConfig() SyncConfig {
 	}
 }
 
+// CompanyConfig contains company information and ticket format settings
+type CompanyConfig struct {
+	CompanyName      string `json:"companyName"`
+	CompanyAddress   string `json:"companyAddress"`
+	CompanyPhone     string `json:"companyPhone"`
+	CompanyEmail     string `json:"companyEmail"`
+	CompanyCode      string `json:"companyCode"`
+	TicketDateFormat string `json:"ticketDateFormat"`
+	TicketDigits     int    `json:"ticketDigits"`
+	TicketSeparator  string `json:"ticketSeparator"`
+}
+
 // AppConfig represents complete application configuration
 type AppConfig struct {
 	DeviceID      uuid.UUID      `json:"deviceId"`
@@ -188,6 +200,7 @@ type AppConfig struct {
 	DatabasePath  string         `json:"databasePath"`
 	Weighing      WeighingConfig `json:"weighing"`
 	Sync          SyncConfig     `json:"sync"`
+	Company       CompanyConfig  `json:"company"`
 }
 
 // ValidationError represents a validation error

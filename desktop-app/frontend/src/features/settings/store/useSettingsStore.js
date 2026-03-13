@@ -1,60 +1,105 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
+import {
+  GetSystemSettings,
+  UpdateSystemSettings,
+  TestCOMPortConnection
+} from '../../../../wailsjs/go/main/App'
+
+const DEFAULT_GENERAL_SETTINGS = {
+  siteName: 'Smart Mill Scale',
+  siteDescription: 'Sistem Manajemen Timbangan Digital',
+  language: 'id',
+  timezone: 'Asia/Jakarta',
+  dateFormat: 'DD/MM/YYYY',
+  timeFormat: '24'
+}
+
+const DEFAULT_SYSTEM_SETTINGS = {
+  autoBackup: true,
+  backupInterval: 'daily',
+  retentionDays: 30,
+  syncEnabled: true,
+  syncInterval: 5,
+  sessionTimeout: 30,
+  maxLoginAttempts: 3
+}
+
+const DEFAULT_SERIAL_SETTINGS = {
+  port: 'COM1',
+  baudRate: 9600,
+  dataBits: 8,
+  parity: 'none',
+  stopBits: 1,
+  timeout: 5000,
+  retryAttempts: 3
+}
+
+const DEFAULT_SECURITY_SETTINGS = {
+  passwordMinLength: 6,
+  passwordRequireUppercase: false,
+  passwordRequireNumbers: true,
+  passwordRequireSymbols: false,
+  sessionTimeoutMinutes: 30,
+  lockScreenAfterMinutes: 10
+}
+
+const DEFAULT_COMPANY_SETTINGS = {
+  companyName: 'PT. Smart Mill Scale',
+  companyAddress: '',
+  companyPhone: '',
+  companyEmail: '',
+  companyCode: 'SMS',
+  ticketDateFormat: 'YYYYMM',
+  ticketDigits: 4,
+  ticketSeparator: '-'
+}
+
+const composeSettings = (state) => ({
+  general: state.generalSettings,
+  system: state.systemSettings,
+  serial: state.serialSettings,
+  security: state.securitySettings,
+  company: state.companySettings
+})
+
+const mergeWithDefaults = (payload = {}) => ({
+  generalSettings: {
+    ...DEFAULT_GENERAL_SETTINGS,
+    ...(payload.general || {})
+  },
+  systemSettings: {
+    ...DEFAULT_SYSTEM_SETTINGS,
+    ...(payload.system || {})
+  },
+  serialSettings: {
+    ...DEFAULT_SERIAL_SETTINGS,
+    ...(payload.serial || {})
+  },
+  securitySettings: {
+    ...DEFAULT_SECURITY_SETTINGS,
+    ...(payload.security || {})
+  },
+  companySettings: {
+    ...DEFAULT_COMPANY_SETTINGS,
+    ...(payload.company || {})
+  }
+})
 
 const useSettingsStore = create(
   devtools(
     (set, get) => ({
-      // Settings state
       settings: null,
       isLoading: false,
       error: null,
       hasChanges: false,
 
-      // General settings
-      generalSettings: {
-        siteName: 'Smart Mill Scale',
-        siteDescription: 'Sistem Manajemen Timbangan Digital',
-        language: 'id',
-        timezone: 'Asia/Jakarta',
-        dateFormat: 'DD/MM/YYYY',
-        timeFormat: '24'
-      },
+      generalSettings: { ...DEFAULT_GENERAL_SETTINGS },
+      systemSettings: { ...DEFAULT_SYSTEM_SETTINGS },
+      serialSettings: { ...DEFAULT_SERIAL_SETTINGS },
+      securitySettings: { ...DEFAULT_SECURITY_SETTINGS },
+      companySettings: { ...DEFAULT_COMPANY_SETTINGS },
 
-      // System settings
-      systemSettings: {
-        autoBackup: true,
-        backupInterval: 'daily',
-        retentionDays: 30,
-        syncEnabled: true,
-        syncInterval: 5,
-        sessionTimeout: 30,
-        maxLoginAttempts: 3
-      },
-
-      // Serial port settings
-      serialSettings: {
-        port: 'COM1',
-        baudRate: 9600,
-        dataBits: 8,
-        parity: 'none',
-        stopBits: 1,
-        timeout: 5000,
-        retryAttempts: 3
-      },
-
-      // Security settings
-      securitySettings: {
-        passwordMinLength: 6,
-        passwordRequireUppercase: false,
-        passwordRequireNumbers: true,
-        passwordRequireSymbols: false,
-        sessionTimeoutMinutes: 30,
-        lockScreenAfterMinutes: 10
-      },
-
-
-
-      // Actions
       setSettings: (settings) => set({ settings }),
       setLoading: (loading) => set({ isLoading: loading }),
       setError: (error) => set({ error }),
@@ -100,66 +145,76 @@ const useSettingsStore = create(
         }))
       },
 
+      updateCompanySettings: (field, value) => {
+        set(state => ({
+          companySettings: {
+            ...state.companySettings,
+            [field]: value
+          },
+          hasChanges: true
+        }))
+      },
+
       resetChanges: () => {
         set({ hasChanges: false })
       },
 
-      // Load settings from backend
+      // Load all settings from backend
       loadSettings: async () => {
         set({ isLoading: true, error: null })
 
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Mock settings data
-          const mockSettings = {
-            general: get().generalSettings,
-            system: get().systemSettings,
-            serial: get().serialSettings,
-            security: get().securitySettings
-          }
+          const settingsJSON = await GetSystemSettings()
+          const payload = JSON.parse(settingsJSON)
+          const merged = mergeWithDefaults(payload)
 
           set({
-            settings: mockSettings,
+            ...merged,
+            settings: {
+              general: merged.generalSettings,
+              system: merged.systemSettings,
+              serial: merged.serialSettings,
+              security: merged.securitySettings,
+              company: merged.companySettings
+            },
             isLoading: false,
             hasChanges: false
           })
 
           return { success: true }
         } catch (error) {
+          const merged = mergeWithDefaults()
           set({
-            error: error.message || 'Gagal memuat pengaturan',
-            isLoading: false
+            ...merged,
+            settings: {
+              general: merged.generalSettings,
+              system: merged.systemSettings,
+              serial: merged.serialSettings,
+              security: merged.securitySettings,
+              company: merged.companySettings
+            },
+            isLoading: false,
+            hasChanges: false
           })
-          return { success: false, error: error.message }
+          return { success: true }
         }
       },
 
-      // Save settings to backend
+      // Save all settings to backend
       saveSettings: async () => {
         set({ isLoading: true, error: null })
 
         try {
-          const { generalSettings, systemSettings, serialSettings, securitySettings } = get()
-
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1500))
-
-          const updatedSettings = {
-            general: generalSettings,
-            system: systemSettings,
-            serial: serialSettings,
-            security: securitySettings
-          }
+          const payload = composeSettings(get())
+          await UpdateSystemSettings(JSON.stringify(payload))
 
           set({
-            settings: updatedSettings,
+            settings: payload,
             isLoading: false,
             hasChanges: false
           })
 
-          return { success: true }
+          return { success: true, message: 'Pengaturan berhasil disimpan!' }
         } catch (error) {
           set({
             error: error.message || 'Gagal menyimpan pengaturan',
@@ -169,25 +224,34 @@ const useSettingsStore = create(
         }
       },
 
-      // Test serial connection
+      // Test serial connection against backend diagnostics
       testSerialConnection: async () => {
         set({ isLoading: true, error: null })
 
         try {
           const { serialSettings } = get()
+          const portName = (serialSettings.port || '').trim()
 
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 2000))
+          if (!portName) {
+            throw new Error('Port serial harus diisi sebelum pengujian koneksi')
+          }
 
-          // Mock test result
-          const success = Math.random() > 0.2 // 80% success rate
+          const responseJSON = await TestCOMPortConnection(portName)
+          const response = JSON.parse(responseJSON)
 
-          if (!success) {
-            throw new Error('Tidak dapat terhubung ke port serial. Periksa koneksi dan pengaturan.')
+          const canUsePort = Boolean(response.canRead && response.canWrite)
+          if (!canUsePort) {
+            if (response.requiresAdmin) {
+              throw new Error(`Port ${portName} memerlukan hak administrator`) 
+            }
+            throw new Error(response.errorMessage || `Port ${portName} tidak dapat diakses`)
           }
 
           set({ isLoading: false })
-          return { success: true, message: 'Koneksi serial berhasil!' }
+          return {
+            success: true,
+            message: `Koneksi serial ${portName} berhasil!`
+          }
         } catch (error) {
           set({
             error: error.message || 'Gagal menguji koneksi serial',
@@ -197,24 +261,18 @@ const useSettingsStore = create(
         }
       },
 
-      // Export settings
       exportSettings: async () => {
         set({ isLoading: true, error: null })
 
         try {
           const { settings } = get()
 
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Create export data
           const exportData = {
             version: '1.0.0',
             timestamp: new Date().toISOString(),
-            settings: settings
+            settings
           }
 
-          // Create download link
           const blob = new Blob([JSON.stringify(exportData, null, 2)], {
             type: 'application/json'
           })
@@ -238,33 +296,27 @@ const useSettingsStore = create(
         }
       },
 
-      // Import settings
       importSettings: async (file) => {
         set({ isLoading: true, error: null })
 
         try {
-          // Read file
           const text = await file.text()
           const data = JSON.parse(text)
 
-          // Validate structure
           if (!data.settings) {
             throw new Error('Format file pengaturan tidak valid')
           }
 
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Update settings
-          const { general, system, serial, security } = data.settings
-
-          if (general) set(state => ({ generalSettings: { ...state.generalSettings, ...general } }))
-          if (system) set(state => ({ systemSettings: { ...state.systemSettings, ...system } }))
-          if (serial) set(state => ({ serialSettings: { ...state.serialSettings, ...serial } }))
-          if (security) set(state => ({ securitySettings: { ...state.securitySettings, ...security } }))
-
+          const merged = mergeWithDefaults(data.settings)
           set({
-            settings: data.settings,
+            ...merged,
+            settings: {
+              general: merged.generalSettings,
+              system: merged.systemSettings,
+              serial: merged.serialSettings,
+              security: merged.securitySettings,
+              company: merged.companySettings
+            },
             isLoading: false,
             hasChanges: true
           })
@@ -279,63 +331,19 @@ const useSettingsStore = create(
         }
       },
 
-      // Reset to defaults
       resetToDefaults: async () => {
         set({ isLoading: true, error: null })
 
         try {
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000))
-
-          // Reset to default values
-          const defaultGeneralSettings = {
-            siteName: 'Smart Mill Scale',
-            siteDescription: 'Sistem Manajemen Timbangan Digital',
-            language: 'id',
-            timezone: 'Asia/Jakarta',
-            dateFormat: 'DD/MM/YYYY',
-            timeFormat: '24'
-          }
-
-          const defaultSystemSettings = {
-            autoBackup: true,
-            backupInterval: 'daily',
-            retentionDays: 30,
-            syncEnabled: true,
-            syncInterval: 5,
-            sessionTimeout: 30,
-            maxLoginAttempts: 3
-          }
-
-          const defaultSerialSettings = {
-            port: 'COM1',
-            baudRate: 9600,
-            dataBits: 8,
-            parity: 'none',
-            stopBits: 1,
-            timeout: 5000,
-            retryAttempts: 3
-          }
-
-          const defaultSecuritySettings = {
-            passwordMinLength: 6,
-            passwordRequireUppercase: false,
-            passwordRequireNumbers: true,
-            passwordRequireSymbols: false,
-            sessionTimeoutMinutes: 30,
-            lockScreenAfterMinutes: 10
-          }
-
+          const merged = mergeWithDefaults()
           set({
-            generalSettings: defaultGeneralSettings,
-            systemSettings: defaultSystemSettings,
-            serialSettings: defaultSerialSettings,
-            securitySettings: defaultSecuritySettings,
+            ...merged,
             settings: {
-              general: defaultGeneralSettings,
-              system: defaultSystemSettings,
-              serial: defaultSerialSettings,
-              security: defaultSecuritySettings
+              general: merged.generalSettings,
+              system: merged.systemSettings,
+              serial: merged.serialSettings,
+              security: merged.securitySettings,
+              company: merged.companySettings
             },
             isLoading: false,
             hasChanges: true
@@ -349,9 +357,7 @@ const useSettingsStore = create(
           })
           return { success: false, error: error.message }
         }
-      },
-
-
+      }
     }),
     {
       name: 'settings-store'

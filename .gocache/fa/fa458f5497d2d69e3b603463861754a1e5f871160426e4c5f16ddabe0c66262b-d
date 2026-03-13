@@ -1,0 +1,5 @@
+./device.go
+./sync.go
+./system_settings.go
+./timbangan.go
+./user.go

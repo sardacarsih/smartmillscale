@@ -1,0 +1,12 @@
+# test log
+stat C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_GetOrInitSettings_MigratesLegacyConfig1906762357\001
+open C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_GetOrInitSettings_MigratesLegacyConfig1906762357\001\.db_write_test
+stat C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_GetOrInitSettings_MigratesLegacyConfig1906762357
+open C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_GetOrInitSettings_MigratesLegacyConfig1906762357\002\config.json
+open C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_GetOrInitSettings_MigratesLegacyConfig1906762357\002\config.json
+open C:\Users\dharyadi\AppData\Local\Temp
+stat C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_UpdateSettings_RoundTrip3850711523\001
+open C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_UpdateSettings_RoundTrip3850711523\001\.db_write_test
+stat C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_UpdateSettings_RoundTrip3850711523
+open C:\Users\dharyadi\AppData\Local\Temp\TestSystemSettingsService_UpdateSettings_RoundTrip3850711523\002\missing-config.json
+open C:\Users\dharyadi\AppData\Local\Temp

@@ -18,7 +18,7 @@ const SerialSettings = () => {
     { value: 'mark', label: 'Mark' },
     { value: 'space', label: 'Space' }
   ]
-  const stopBits = [1, 1.5, 2]
+  const stopBits = [1, 2]
 
   return (
     <div className="p-6 space-y-8">
@@ -44,11 +44,11 @@ const SerialSettings = () => {
               <input
                 type="text"
                 value={serialSettings.port}
-                readOnly
-                placeholder="Configured from .env"
-                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none cursor-not-allowed"
+                onChange={(e) => updateSerialSettings('port', e.target.value)}
+                placeholder="Contoh: COM3"
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <p className="text-xs text-gray-500 mt-1">Port dikonfigurasi dari file .env</p>
+              <p className="text-xs text-gray-500 mt-1">Port disimpan ke database dan dipakai saat runtime</p>
             </div>
 
             <div>
@@ -108,7 +108,7 @@ const SerialSettings = () => {
               </label>
               <select
                 value={serialSettings.stopBits}
-                onChange={(e) => updateSerialSettings('stopBits', parseFloat(e.target.value))}
+                onChange={(e) => updateSerialSettings('stopBits', parseInt(e.target.value, 10))}
                 className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {stopBits.map(bits => (
@@ -223,3 +223,4 @@ const SerialSettings = () => {
 }
 
 export default SerialSettings
+

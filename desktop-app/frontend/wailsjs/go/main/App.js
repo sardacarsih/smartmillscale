@@ -150,6 +150,10 @@ export function GetBlokPaginated(arg1) {
   return window['go']['main']['App']['GetBlokPaginated'](arg1);
 }
 
+export function GetCompanyConfig() {
+  return window['go']['main']['App']['GetCompanyConfig']();
+}
+
 export function GetCurrentUser() {
   return window['go']['main']['App']['GetCurrentUser']();
 }
@@ -470,6 +474,10 @@ export function UpdateBlok(arg1, arg2) {
   return window['go']['main']['App']['UpdateBlok'](arg1, arg2);
 }
 
+export function UpdateCompanyConfig(arg1) {
+  return window['go']['main']['App']['UpdateCompanyConfig'](arg1);
+}
+
 export function UpdateDashboardData(arg1, arg2) {
   return window['go']['main']['App']['UpdateDashboardData'](arg1, arg2);
 }
@@ -520,4 +528,13 @@ export function ValidatePKSReportRequest(arg1, arg2) {
 
 export function ValidateWeighing(arg1) {
   return window['go']['main']['App']['ValidateWeighing'](arg1);
+}
+
+
+export function GetSystemSettings() {
+  return window['go']['main']['App']['GetSystemSettings']();
+}
+
+export function UpdateSystemSettings(arg1) {
+  return window['go']['main']['App']['UpdateSystemSettings'](arg1);
 }

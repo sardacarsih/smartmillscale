@@ -4,20 +4,23 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
+	"github.com/yourusername/gosmartmillscale/desktop-app/internal/application/dto"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/auth"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/config"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/database"
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/infrastructure/persistence/models"
+	appservice "github.com/yourusername/gosmartmillscale/desktop-app/internal/service"
+	"gorm.io/gorm"
 )
 
 // Application represents the main application
 type Application struct {
 	Container *Container
 	config    *Config
-	appConfig  *config.AppConfig
+	appConfig *config.AppConfig
 }
 
 // Config represents application configuration
@@ -69,8 +72,18 @@ func (app *Application) InitializeForRole(ctx context.Context, userRole string) 
 		db = app.Container.DB
 	}
 
+	settingsSvc := appservice.NewSystemSettingsService(configPath)
+	persistedSettings, err := settingsSvc.GetOrInitSettings(db)
+	if err != nil {
+		return fmt.Errorf("failed to load persisted system settings: %w", err)
+	}
+	applyPersistedSettingsToAppConfig(appConfig, persistedSettings)
+
 	// Create dependency container with full configuration and Wails context
 	app.Container = NewContainerWithConfigAndRole(db, app.config.DeviceID, appConfig, ctx, userRole)
+
+	// Apply sync runtime settings (minutes -> seconds) to SyncUseCase config.
+	applyPersistedSyncConfig(app.Container, persistedSettings)
 
 	// Run migrations (skip if already run by core application)
 	if err := app.runMigrations(db); err != nil {
@@ -85,6 +98,74 @@ func (app *Application) InitializeForRole(ctx context.Context, userRole string) 
 
 	log.Printf("Application initialized successfully for role: %s, device ID: %s", userRole, app.config.DeviceID)
 	return nil
+}
+
+func applyPersistedSettingsToAppConfig(appConfig *config.AppConfig, persisted *appservice.SystemSettingsPayload) {
+	if appConfig == nil || persisted == nil {
+		return
+	}
+
+	appConfig.Company = persisted.Company
+	appConfig.Weighing.COMPort = persisted.Serial.Port
+	appConfig.Weighing.BaudRate = persisted.Serial.BaudRate
+	appConfig.Weighing.DataBits = persisted.Serial.DataBits
+	appConfig.Weighing.StopBits = persisted.Serial.StopBits
+	appConfig.Weighing.Parity = mapParityUIToConfig(persisted.Serial.Parity)
+	appConfig.Weighing.ReadTimeout = persisted.Serial.Timeout
+	if appConfig.Weighing.WriteTimeout <= 0 {
+		appConfig.Weighing.WriteTimeout = persisted.Serial.Timeout
+	}
+
+	if persisted.System.SyncInterval > 0 {
+		appConfig.Sync.SyncInterval = time.Duration(persisted.System.SyncInterval) * time.Minute
+	}
+}
+
+func applyPersistedSyncConfig(container *Container, persisted *appservice.SystemSettingsPayload) {
+	if container == nil || container.SyncUseCase == nil || persisted == nil {
+		return
+	}
+
+	current := container.SyncUseCase.GetSyncConfig()
+	next := &dto.SyncConfig{}
+	if current != nil {
+		*next = *current
+	}
+
+	next.AutoSyncEnabled = persisted.System.SyncEnabled
+	next.SyncInterval = persisted.System.SyncInterval * 60
+	if next.SyncInterval <= 0 {
+		next.SyncInterval = 300
+	}
+	if next.MaxRetries <= 0 {
+		next.MaxRetries = 3
+	}
+	if next.RetryDelay <= 0 {
+		next.RetryDelay = 60
+	}
+	if next.BatchSize <= 0 {
+		next.BatchSize = 50
+	}
+	if next.Timeout <= 0 {
+		next.Timeout = 30
+	}
+
+	container.SyncUseCase.UpdateSyncConfig(next)
+}
+
+func mapParityUIToConfig(parity string) string {
+	switch parity {
+	case "even":
+		return "E"
+	case "odd":
+		return "O"
+	case "mark":
+		return "M"
+	case "space":
+		return "S"
+	default:
+		return "N"
+	}
 }
 
 // initDatabase initializes the database connection
@@ -117,6 +198,7 @@ func (app *Application) runMigrations(db *gorm.DB) error {
 		&models.DeviceInfoModel{},
 		&models.WeighingSessionModel{},
 		&models.AuditLogModel{},
+		&models.SystemSettingsModel{},
 
 		// PKS Master Data Tables
 		&database.MasterProduk{},
@@ -128,7 +210,6 @@ func (app *Application) runMigrations(db *gorm.DB) error {
 		&database.MasterBlok{},
 		&database.TimbanganPKS{},
 		&database.PKSTicket{},
-
 	}
 
 	// Run migrations with error handling
@@ -226,7 +307,7 @@ func (app *Application) fixUserRoles(db *gorm.DB) error {
 		"supervisor": auth.RoleSupervisor,
 		"timbangan":  auth.RoleTimbangan,
 		"grading":    auth.RoleGrading,
-		"ADMIN":      auth.RoleAdmin,      // Already correct, but include for completeness
+		"ADMIN":      auth.RoleAdmin, // Already correct, but include for completeness
 		"SUPERVISOR": auth.RoleSupervisor,
 		"TIMBANGAN":  auth.RoleTimbangan,
 		"GRADING":    auth.RoleGrading,

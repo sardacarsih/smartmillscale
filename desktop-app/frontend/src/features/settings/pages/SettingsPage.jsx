@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Settings,
+  Building2,
   Globe,
   Database,
   Cpu,
@@ -16,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../auth'
 import useSettingsStore from '../store/useSettingsStore'
+import CompanySettings from '../components/CompanySettings'
 import GeneralSettings from '../components/GeneralSettings'
 import SystemSettings from '../components/SystemSettings'
 import SerialSettings from '../components/SerialSettings'
@@ -37,13 +39,14 @@ const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
     clearError
   } = useSettingsStore()
 
-  const [activeTab, setActiveTab] = useState('general')
+  const [activeTab, setActiveTab] = useState('company')
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false)
   const [pendingNavigation, setPendingNavigation] = useState(null)
   const [importResult, setImportResult] = useState(null)
   const fileInputRef = useRef(null)
 
   const tabs = [
+    { id: 'company', label: 'Perusahaan', icon: Building2 },
     { id: 'general', label: 'Umum', icon: Globe },
     { id: 'system', label: 'Sistem', icon: Database },
     { id: 'serial', label: 'Serial Port', icon: Cpu },
@@ -321,6 +324,7 @@ const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
 
           {settings && (
             <>
+              {activeTab === 'company' && <CompanySettings />}
               {activeTab === 'general' && <GeneralSettings />}
               {activeTab === 'system' && <SystemSettings />}
               {activeTab === 'serial' && <SerialSettings />}

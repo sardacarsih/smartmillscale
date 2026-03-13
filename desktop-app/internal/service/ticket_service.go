@@ -10,16 +10,23 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/yourusername/gosmartmillscale/desktop-app/internal/database"
+	"github.com/yourusername/gosmartmillscale/shared/types"
 )
 
 // TicketService handles ticket printing for PKS transactions
 type TicketService struct {
-	db *gorm.DB
+	db      *gorm.DB
+	company *types.CompanyConfig
 }
 
 // NewTicketService creates a new ticket service
 func NewTicketService(db *gorm.DB) *TicketService {
 	return &TicketService{db: db}
+}
+
+// SetCompanyConfig sets the company configuration for ticket generation
+func (s *TicketService) SetCompanyConfig(company *types.CompanyConfig) {
+	s.company = company
 }
 
 // TicketData represents the data needed for ticket printing
@@ -65,17 +72,44 @@ type PrintResponse struct {
 // GenerateTicketNumber generates a unique ticket number
 func (s *TicketService) GenerateTicketNumber() string {
 	now := time.Now()
-	dateStr := now.Format("20060102")
 
-	// Count existing tickets for today
+	// Determine prefix, separator, date format, and digits from config
+	prefix := "SMS"
+	separator := "-"
+	dateFormat := "200601" // Go reference time for YYYYMM
+	digits := 4
+
+	if s.company != nil {
+		if s.company.CompanyCode != "" {
+			prefix = s.company.CompanyCode
+		}
+		if s.company.TicketSeparator != "" {
+			separator = s.company.TicketSeparator
+		}
+		if s.company.TicketDigits >= 3 && s.company.TicketDigits <= 5 {
+			digits = s.company.TicketDigits
+		}
+		switch s.company.TicketDateFormat {
+		case "YYMM":
+			dateFormat = "0601"
+		default:
+			dateFormat = "200601"
+		}
+	}
+
+	dateStr := now.Format(dateFormat)
+
+	// Count existing tickets for current month (reset monthly)
+	firstDayOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
 	var count int64
 	s.db.WithContext(context.Background()).
 		Model(&database.PKSTicket{}).
-		Where("DATE(printed_at) = ?", now.Format("2006-01-02")).
+		Where("printed_at >= ?", firstDayOfMonth).
 		Count(&count)
 
 	sequence := count + 1
-	return fmt.Sprintf("TKT-%s-%04d", dateStr, sequence)
+	seqFormat := fmt.Sprintf("%%0%dd", digits)
+	return prefix + separator + dateStr + separator + fmt.Sprintf(seqFormat, sequence)
 }
 
 // CreateTicketData creates ticket data from a PKS transaction
@@ -88,8 +122,8 @@ func (s *TicketService) CreateTicketData(ctx context.Context, timbangan *databas
 	ticketData := &TicketData{
 		NoTransaksi:   timbangan.NoTransaksi,
 		Tanggal:       timbangan.Timbang1Date,
-		Perusahaan:    "PT. KELAPA SAWIT MANDIRI", // Default company name
-		Alamat:        "Jl. Industri No. 123, Jakarta", // Default address
+		Perusahaan:    s.getCompanyName(),
+		Alamat:        s.getCompanyAddress(),
 		DriverName:    timbangan.DriverName,
 		NomorPolisi:   timbangan.Unit.NomorPolisi,
 		Produk:        timbangan.Produk.NamaProduk,
@@ -280,7 +314,7 @@ No. Tiket: %s
 Tanggal: %s
 
 ----------------------------------------
-PT. KELAPA SAWIT MANDIRI
+%s
 %s
 ----------------------------------------
 
@@ -314,6 +348,7 @@ Copies: %d
 `,
 		ticketData.TicketNumber,
 		ticketData.Tanggal.Format("02-01-2006 15:04:05"),
+		ticketData.Perusahaan,
 		ticketData.Alamat,
 		ticketData.NoTransaksi,
 		ticketData.DriverName,
@@ -333,6 +368,22 @@ Copies: %d
 	)
 
 	return ticket
+}
+
+// getCompanyName returns the company name from config or default
+func (s *TicketService) getCompanyName() string {
+	if s.company != nil && s.company.CompanyName != "" {
+		return s.company.CompanyName
+	}
+	return "PT. Smart Mill Scale"
+}
+
+// getCompanyAddress returns the company address from config or default
+func (s *TicketService) getCompanyAddress() string {
+	if s.company != nil && s.company.CompanyAddress != "" {
+		return s.company.CompanyAddress
+	}
+	return ""
 }
 
 // GetPrintStatistics retrieves printing statistics

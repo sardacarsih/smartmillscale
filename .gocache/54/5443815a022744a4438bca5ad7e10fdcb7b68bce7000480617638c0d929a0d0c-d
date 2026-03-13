@@ -1,0 +1,13 @@
+./database.go
+./models.go
+./models_pks.go
+./seed_afdeling.go
+./seed_blok.go
+./seed_customer.go
+./seed_estate.go
+./seed_produk.go
+./seed_supplier.go
+./seed_unit.go
+./seed_users.go
+./seeder.go
+./sqlite_cgo_free.go

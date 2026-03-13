@@ -146,6 +146,12 @@ func (c *AppConfig) UpdateSyncConfig(config types.SyncConfig) error {
 	return c.Save()
 }
 
+// UpdateCompanyConfig updates company configuration
+func (c *AppConfig) UpdateCompanyConfig(config types.CompanyConfig) error {
+	c.Company = config
+	return c.Save()
+}
+
 // UpdateDeviceInfo updates device information
 func (c *AppConfig) UpdateDeviceInfo(name, location string) error {
 	c.DeviceName = name
@@ -178,6 +184,16 @@ func createDefaultConfig() *AppConfig {
 				RetryBackoff:   1 * time.Second,
 				BatchSize:      50,
 				RequestTimeout: 30 * time.Second,
+			},
+			Company: types.CompanyConfig{
+				CompanyName:      "PT. Smart Mill Scale",
+				CompanyAddress:   "",
+				CompanyPhone:     "",
+				CompanyEmail:     "",
+				CompanyCode:      "SMS",
+				TicketDateFormat: "YYYYMM",
+				TicketDigits:     4,
+				TicketSeparator:  "-",
 			},
 		},
 	}
@@ -215,6 +231,16 @@ func createDefaultConfigFromEnv() *AppConfig {
 				RetryBackoff:   getEnvDurationOrDefault("SYNC_RETRY_DELAY", 1*time.Second),
 				BatchSize:      getEnvIntOrDefault("SYNC_BATCH_SIZE", 50),
 				RequestTimeout: getEnvDurationOrDefault("API_TIMEOUT", 30*time.Second),
+			},
+			Company: types.CompanyConfig{
+				CompanyName:      getEnvOrDefault("COMPANY_NAME", "PT. Smart Mill Scale"),
+				CompanyAddress:   getEnvOrDefault("COMPANY_ADDRESS", ""),
+				CompanyPhone:     getEnvOrDefault("COMPANY_PHONE", ""),
+				CompanyEmail:     getEnvOrDefault("COMPANY_EMAIL", ""),
+				CompanyCode:      getEnvOrDefault("COMPANY_CODE", "SMS"),
+				TicketDateFormat: getEnvOrDefault("TICKET_DATE_FORMAT", "YYYYMM"),
+				TicketDigits:     getEnvIntOrDefault("TICKET_DIGITS", 4),
+				TicketSeparator:  getEnvOrDefault("TICKET_SEPARATOR", "-"),
 			},
 		},
 	}

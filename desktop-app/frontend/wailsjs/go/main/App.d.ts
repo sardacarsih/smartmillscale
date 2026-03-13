@@ -78,6 +78,8 @@ export function GetBlokByAfdeling(arg1:string,arg2:boolean):Promise<string>;
 
 export function GetBlokPaginated(arg1:string):Promise<string>;
 
+export function GetCompanyConfig():Promise<string>;
+
 export function GetCurrentUser():Promise<string>;
 
 export function GetCurrentWeight():Promise<string>;
@@ -238,6 +240,8 @@ export function UpdateAfdeling(arg1:string,arg2:string):Promise<string>;
 
 export function UpdateBlok(arg1:string,arg2:string):Promise<string>;
 
+export function UpdateCompanyConfig(arg1:string):Promise<void>;
+
 export function UpdateDashboardData(arg1:string,arg2:string):Promise<string>;
 
 export function UpdateDashboardLayout(arg1:string,arg2:string):Promise<string>;
@@ -263,3 +267,6 @@ export function UpdateWeighing(arg1:string,arg2:string):Promise<string>;
 export function ValidatePKSReportRequest(arg1:context.Context,arg2:service.ReportRequest):Promise<service.ValidationResult>;
 
 export function ValidateWeighing(arg1:string):Promise<string>;
+
+export function GetSystemSettings():Promise<string>;
+export function UpdateSystemSettings(arg1:string):Promise<void>;

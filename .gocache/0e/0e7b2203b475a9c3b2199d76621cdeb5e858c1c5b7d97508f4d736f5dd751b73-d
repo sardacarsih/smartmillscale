@@ -1,0 +1,7 @@
+./factory.go
+./interface.go
+./mock.go
+./serial.go
+./windows_diagnostics.go
+./windows_elevation.go
+./windows_wmi.go

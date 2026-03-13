@@ -79,6 +79,44 @@ func (s *WeightMonitoringService) SetSerialReader(reader serial.SerialReaderInte
 	s.serialReader = reader
 }
 
+// StartSerialReader starts the configured serial reader without enabling monitoring.
+func (s *WeightMonitoringService) StartSerialReader() error {
+	s.mu.RLock()
+	reader := s.serialReader
+	s.mu.RUnlock()
+
+	if reader == nil {
+		return fmt.Errorf("serial reader not configured")
+	}
+	if reader.IsConnected() {
+		return nil
+	}
+
+	if err := reader.Start(); err != nil {
+		return fmt.Errorf("failed to start serial reader: %w", err)
+	}
+	return nil
+}
+
+// StopSerialReader stops the configured serial reader without changing monitoring state.
+func (s *WeightMonitoringService) StopSerialReader() error {
+	s.mu.RLock()
+	reader := s.serialReader
+	s.mu.RUnlock()
+
+	if reader == nil {
+		return nil
+	}
+	if !reader.IsConnected() {
+		return nil
+	}
+
+	if err := reader.Stop(); err != nil {
+		return fmt.Errorf("failed to stop serial reader: %w", err)
+	}
+	return nil
+}
+
 // StartMonitoring begins real-time weight monitoring
 func (s *WeightMonitoringService) StartMonitoring() error {
 	s.mu.Lock()
