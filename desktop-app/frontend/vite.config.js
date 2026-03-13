@@ -13,25 +13,18 @@ export default defineConfig({
     // Target modern browsers for smaller bundle
     target: 'es2020',
 
-    // Minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.logs in production
-        drop_debugger: true,
-      },
-    },
+    // Minification (esbuild default in Vite 8)
+    minify: 'esbuild',
 
     // Code splitting
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-query': ['@tanstack/react-query'],
-          'vendor-charts': ['recharts'],
-          'vendor-router': ['react-router-dom'],
-          'vendor-state': ['zustand'],
+        manualChunks(id) {
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) return 'vendor-react'
+          if (id.includes('node_modules/@tanstack/react-query')) return 'vendor-query'
+          if (id.includes('node_modules/recharts')) return 'vendor-charts'
+          if (id.includes('node_modules/react-router-dom')) return 'vendor-router'
+          if (id.includes('node_modules/zustand')) return 'vendor-state'
         },
       },
     },
@@ -89,8 +82,4 @@ export default defineConfig({
     ],
   },
 
-  // Performance optimizations
-  esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' },
-  },
 })
