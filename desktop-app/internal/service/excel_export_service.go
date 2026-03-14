@@ -223,7 +223,7 @@ func (s *ExcelExportService) createDetailSheet(f *excelize.File, sheetName strin
 	// Headers
 	headers := []string{
 		"No Transaksi", "Tanggal", "Nomor Kendaraan", "Supplier", "Tipe TBS",
-		"Produk", "Grade", "Bruto (kg)", "Bruto2 (kg)", "Netto (kg)", "Netto2 (kg)",
+		"Sumber TBS", "Produk", "Grade", "Bruto (kg)", "Bruto2 (kg)", "Netto (kg)", "Netto2 (kg)",
 		"Status", "Petugas 1", "Petugas 2",
 	}
 
@@ -251,6 +251,7 @@ func (s *ExcelExportService) createDetailSheet(f *excelize.File, sheetName strin
 			tx.NomorKendaraan,
 			tx.SupplierName,
 			tx.SupplierType,
+			tx.SourceSummary,
 			tx.ProductName,
 			tx.Grade,
 			tx.Bruto,
@@ -278,8 +279,8 @@ func (s *ExcelExportService) createDetailSheet(f *excelize.File, sheetName strin
 	// Set column widths
 	colWidths := map[string]float64{
 		"A": 18, "B": 16, "C": 15, "D": 20, "E": 12,
-		"F": 15, "G": 8,  "H": 12, "I": 12, "J": 12,
-		"K": 12, "L": 12, "M": 15, "N": 15,
+		"F": 20, "G": 15, "H": 8, "I": 12, "J": 12,
+		"K": 12, "L": 12, "M": 12, "N": 15, "O": 15,
 	}
 	for col, width := range colWidths {
 		f.SetColWidth(sheetName, col, col, width)

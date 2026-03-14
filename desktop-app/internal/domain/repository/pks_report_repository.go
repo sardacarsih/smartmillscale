@@ -41,6 +41,10 @@ func (r *PKSReportRepository) GetTransactionsWithDetails(ctx context.Context, da
 		Preload("Estate").
 		Preload("Afdeling").
 		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Preload("Officer1").
 		Preload("Officer2").
 		Where("timbang1_date >= ? AND timbang1_date <= ?", dateRange.Start, dateRange.End)
@@ -302,6 +306,13 @@ func (r *PKSReportRepository) DetectWeightOutliers(ctx context.Context, dateRang
 		Preload("Produk").
 		Preload("Unit").
 		Preload("Supplier").
+		Preload("Estate").
+		Preload("Afdeling").
+		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Preload("Officer1").
 		Preload("Officer2").
 		Where("timbang1_date >= ? AND timbang1_date <= ?", dateRange.Start, dateRange.End).
@@ -397,6 +408,13 @@ func (r *PKSReportRepository) GetIncompleteTransactions(ctx context.Context, dat
 		Preload("Produk").
 		Preload("Unit").
 		Preload("Supplier").
+		Preload("Estate").
+		Preload("Afdeling").
+		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Preload("Officer1").
 		Preload("Officer2").
 		Where("timbang1_date >= ? AND timbang1_date <= ?", dateRange.Start, dateRange.End).
@@ -419,6 +437,13 @@ func (r *PKSReportRepository) GetMissingSecondWeighing(ctx context.Context, date
 		Preload("Produk").
 		Preload("Unit").
 		Preload("Supplier").
+		Preload("Estate").
+		Preload("Afdeling").
+		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Preload("Officer1").
 		Where("timbang1_date >= ? AND timbang1_date <= ?", dateRange.Start, dateRange.End).
 		Where("timbang2_date IS NULL AND status = ?", "selesai").

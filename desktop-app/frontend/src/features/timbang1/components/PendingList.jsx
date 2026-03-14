@@ -1,6 +1,45 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import usePKSStore from '../store/usePKSStore'
 import { useWailsService } from '../../../shared/contexts/WailsContext'
+
+const getSourceSummary = (transaction) => {
+  if (transaction?.sourceSummary) {
+    return transaction.sourceSummary
+  }
+
+  const detailRows = Array.isArray(transaction?.tbs_block_details)
+    ? transaction.tbs_block_details
+    : (Array.isArray(transaction?.tbsBlockDetails) ? transaction.tbsBlockDetails : [])
+
+  if (detailRows.length > 1) {
+    return `Campuran (${detailRows.length} blok)`
+  }
+
+  if (detailRows.length === 1) {
+    const detail = detailRows[0]
+    const blok = detail?.blok || {}
+    const kode = blok.kode_blok || blok.kodeBlok
+    const nama = blok.nama_blok || blok.namaBlok
+    if (kode && nama) {
+      return `${kode} - ${nama}`
+    }
+    if (nama) {
+      return nama
+    }
+    if (kode) {
+      return kode
+    }
+  }
+
+  const blok = transaction?.blok || {}
+  const kode = blok.kode_blok || blok.kodeBlok
+  const nama = blok.nama_blok || blok.namaBlok
+  if (kode && nama) {
+    return `${kode} - ${nama}`
+  }
+
+  return transaction?.sumber_tbs || transaction?.sumberTbs || '-'
+}
 
 const PendingList = ({ onSelectTransaction }) => {
   const pksService = useWailsService('pks')
@@ -57,21 +96,26 @@ const PendingList = ({ onSelectTransaction }) => {
             <div className="flex items-center justify-between">
               <div>
                 <div className="text-sm text-white font-medium">
-                  {transaction.vehicleNumber || 'Unknown Vehicle'}
+                  {transaction.unit?.nomor_polisi || transaction.nomor_kendaraan || '-'}
                 </div>
                 <div className="text-gray-400 text-xs">
-                  {transaction.transporterName || 'Unknown Transporter'}
+                  {transaction.produk?.nama_produk || transaction.productName || '-'}
+                </div>
+                <div className="text-gray-500 text-[11px]">
+                  {getSourceSummary(transaction)}
                 </div>
                 <div className="text-gray-500 text-[10px]">
-                  {transaction.createdAt ? new Date(transaction.createdAt).toLocaleString() : 'No timestamp'}
+                  {transaction.timbang1_date || transaction.timbang1Date
+                    ? new Date(transaction.timbang1_date || transaction.timbang1Date).toLocaleString('id-ID')
+                    : '-'}
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-sm text-white font-medium">
-                  {transaction.weight ? `${transaction.weight} kg` : 'No weight'}
+                  {Number.isFinite(Number(transaction.bruto)) ? `${Number(transaction.bruto).toFixed(2)} kg` : '-'}
                 </div>
                 <div className="text-yellow-400 text-xs">
-                  {transaction.status || 'Pending'}
+                  {transaction.status || 'timbang1'}
                 </div>
               </div>
             </div>

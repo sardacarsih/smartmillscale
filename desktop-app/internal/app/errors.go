@@ -309,7 +309,7 @@ func (h *DefaultErrorHandler) Recover(ctx context.Context) error {
 		case error:
 			err = x
 		case string:
-			err = fmt.Errorf(x)
+			err = fmt.Errorf("%s", x)
 		default:
 			err = fmt.Errorf("panic: %v", x)
 		}

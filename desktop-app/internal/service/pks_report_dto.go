@@ -28,11 +28,11 @@ type ReportFilters struct {
 
 // ReportData is the main response structure containing all report sections
 type ReportData struct {
-	Summary   ReportSummary  `json:"summary"`
+	Summary      ReportSummary       `json:"summary"`
 	Transactions []TransactionDetail `json:"transactions"`
-	Trends    TrendAnalysis  `json:"trends"`
-	Anomalies AnomalyReport  `json:"anomalies"`
-	Metadata  ReportMetadata `json:"metadata"`
+	Trends       TrendAnalysis       `json:"trends"`
+	Anomalies    AnomalyReport       `json:"anomalies"`
+	Metadata     ReportMetadata      `json:"metadata"`
 }
 
 // ============================================================================
@@ -58,9 +58,9 @@ type TBSTypeData struct {
 
 // RejectionData contains rejection/afkir metrics
 type RejectionData struct {
-	Count       int     `json:"count"`
-	TotalWeight float64 `json:"totalWeight"`
-	Percentage  float64 `json:"percentage"`
+	Count       int            `json:"count"`
+	TotalWeight float64        `json:"totalWeight"`
+	Percentage  float64        `json:"percentage"`
 	Reasons     map[string]int `json:"reasons"` // Reason -> count (e.g., "Grade C": 5, "Incomplete": 3)
 }
 
@@ -93,15 +93,17 @@ type TransactionDetail struct {
 	ProductName string `json:"productName"`
 	ProductCode string `json:"productCode,omitempty"`
 	ProductID   *uint  `json:"productId,omitempty"`
+	// Source summary for TBS origin (single block, estate/afdeling fallback, or mixed blocks)
+	SourceSummary string `json:"sourceSummary,omitempty"`
 
 	// Quality grading
 	Grade        string `json:"grade"`
 	QualityGrade string `json:"qualityGrade"`
 
 	// Weight measurements
-	Bruto  float64  `json:"bruto"`  // First weighing gross
-	Tara   float64  `json:"tara"`   // First weighing tare
-	Netto  float64  `json:"netto"`  // First weighing net
+	Bruto  float64  `json:"bruto"`            // First weighing gross
+	Tara   float64  `json:"tara"`             // First weighing tare
+	Netto  float64  `json:"netto"`            // First weighing net
 	Bruto2 *float64 `json:"bruto2,omitempty"` // Second weighing gross
 	Tara2  *float64 `json:"tara2,omitempty"`  // Second weighing tare
 	Netto2 *float64 `json:"netto2,omitempty"` // Second weighing net
@@ -118,12 +120,12 @@ type TransactionDetail struct {
 	Officer2ID   *uint  `json:"officer2Id,omitempty"`
 
 	// Additional details
-	Notes      string `json:"notes,omitempty"`
-	PhotoPath  string `json:"photoPath,omitempty"`
+	Notes     string `json:"notes,omitempty"`
+	PhotoPath string `json:"photoPath,omitempty"`
 
 	// Metadata
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time  `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
 	SyncedAt  *time.Time `json:"syncedAt,omitempty"`
 }
 
@@ -133,7 +135,7 @@ type TransactionDetail struct {
 
 // TrendAnalysis contains time-series and distribution data
 type TrendAnalysis struct {
-	DailyTrends        []DailyTrendPoint        `json:"dailyTrends"`
+	DailyTrends        []DailyTrendPoint         `json:"dailyTrends"`
 	HourlyDistribution []HourlyDistributionPoint `json:"hourlyDistribution,omitempty"` // Only for daily reports
 	SourceDistribution []SourceDistributionPoint `json:"sourceDistribution"`
 	GradeDistribution  []GradeDistributionPoint  `json:"gradeDistribution"`
@@ -175,27 +177,27 @@ type GradeDistributionPoint struct {
 
 // AnomalyReport contains detected anomalies in the data
 type AnomalyReport struct {
-	OutlierTransactions       []OutlierTransaction       `json:"outlierTransactions"`
-	IncompleteTransactions    []IncompleteTransaction    `json:"incompleteTransactions"`
-	DuplicateVehicles         []DuplicateVehicleEntry    `json:"duplicateVehicles"`
-	MissingSecondWeighing     []TransactionDetail        `json:"missingSecondWeighing"`
-	Summary                   AnomalySummary             `json:"summary"`
+	OutlierTransactions    []OutlierTransaction    `json:"outlierTransactions"`
+	IncompleteTransactions []IncompleteTransaction `json:"incompleteTransactions"`
+	DuplicateVehicles      []DuplicateVehicleEntry `json:"duplicateVehicles"`
+	MissingSecondWeighing  []TransactionDetail     `json:"missingSecondWeighing"`
+	Summary                AnomalySummary          `json:"summary"`
 }
 
 // OutlierTransaction represents a transaction with unusual weight
 type OutlierTransaction struct {
 	Transaction TransactionDetail `json:"transaction"`
-	ZScore      float64           `json:"zScore"`      // Statistical z-score
-	Deviation   float64           `json:"deviation"`   // Deviation from mean (kg)
-	Reason      string            `json:"reason"`      // "Unusually high" or "Unusually low"
+	ZScore      float64           `json:"zScore"`    // Statistical z-score
+	Deviation   float64           `json:"deviation"` // Deviation from mean (kg)
+	Reason      string            `json:"reason"`    // "Unusually high" or "Unusually low"
 }
 
 // IncompleteTransaction represents a transaction stuck in progress
 type IncompleteTransaction struct {
 	Transaction TransactionDetail `json:"transaction"`
-	AgeHours    float64           `json:"ageHours"`    // Hours since Timbang1Date
-	Stage       string            `json:"stage"`       // "TIMBANG1", "TIMBANG2"
-	Reason      string            `json:"reason"`      // Why it's incomplete
+	AgeHours    float64           `json:"ageHours"` // Hours since Timbang1Date
+	Stage       string            `json:"stage"`    // "TIMBANG1", "TIMBANG2"
+	Reason      string            `json:"reason"`   // Why it's incomplete
 }
 
 // DuplicateVehicleEntry represents a vehicle with multiple transactions
@@ -207,10 +209,10 @@ type DuplicateVehicleEntry struct {
 
 // AnomalySummary provides overview of detected anomalies
 type AnomalySummary struct {
-	TotalOutliers         int `json:"totalOutliers"`
-	TotalIncomplete       int `json:"totalIncomplete"`
-	TotalDuplicates       int `json:"totalDuplicates"`
-	TotalMissingSecond    int `json:"totalMissingSecond"`
+	TotalOutliers      int `json:"totalOutliers"`
+	TotalIncomplete    int `json:"totalIncomplete"`
+	TotalDuplicates    int `json:"totalDuplicates"`
+	TotalMissingSecond int `json:"totalMissingSecond"`
 }
 
 // ============================================================================
@@ -220,7 +222,7 @@ type AnomalySummary struct {
 // ReportMetadata contains information about the report generation
 type ReportMetadata struct {
 	GeneratedAt  time.Time `json:"generatedAt"`
-	GeneratedBy  string    `json:"generatedBy"`  // Username
+	GeneratedBy  string    `json:"generatedBy"` // Username
 	PeriodStart  time.Time `json:"periodStart"`
 	PeriodEnd    time.Time `json:"periodEnd"`
 	TotalRecords int       `json:"totalRecords"` // Total transactions in report
@@ -233,26 +235,26 @@ type ReportMetadata struct {
 
 // OperationalConclusions contains business insights derived from the data
 type OperationalConclusions struct {
-	PeakHours        []int                `json:"peakHours"`        // Hours with most activity
-	TopSuppliers     []TopSupplierData    `json:"topSuppliers"`     // Most active suppliers
-	QualitySummary   QualitySummary       `json:"qualitySummary"`   // Quality metrics
-	Recommendations  []string             `json:"recommendations"`  // System-generated recommendations
+	PeakHours       []int             `json:"peakHours"`       // Hours with most activity
+	TopSuppliers    []TopSupplierData `json:"topSuppliers"`    // Most active suppliers
+	QualitySummary  QualitySummary    `json:"qualitySummary"`  // Quality metrics
+	Recommendations []string          `json:"recommendations"` // System-generated recommendations
 }
 
 // TopSupplierData represents top performing suppliers
 type TopSupplierData struct {
-	SupplierName   string  `json:"supplierName"`
-	TransactionCount int    `json:"transactionCount"`
-	TotalWeight    float64 `json:"totalWeight"`
-	Rank           int     `json:"rank"`
+	SupplierName     string  `json:"supplierName"`
+	TransactionCount int     `json:"transactionCount"`
+	TotalWeight      float64 `json:"totalWeight"`
+	Rank             int     `json:"rank"`
 }
 
 // QualitySummary contains quality-related metrics
 type QualitySummary struct {
-	PassRate         float64            `json:"passRate"`         // % of completed transactions
-	RejectionRate    float64            `json:"rejectionRate"`    // % of rejected transactions
-	TopGrade         string             `json:"topGrade"`         // Most common grade
-	GradeBreakdown   map[string]int     `json:"gradeBreakdown"`   // Grade -> count
+	PassRate       float64        `json:"passRate"`       // % of completed transactions
+	RejectionRate  float64        `json:"rejectionRate"`  // % of rejected transactions
+	TopGrade       string         `json:"topGrade"`       // Most common grade
+	GradeBreakdown map[string]int `json:"gradeBreakdown"` // Grade -> count
 }
 
 // ============================================================================

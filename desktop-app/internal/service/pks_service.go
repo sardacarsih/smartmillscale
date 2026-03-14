@@ -50,8 +50,9 @@ func (s *PKSService) CreateTimbang1(ctx context.Context, req *CreateTimbang1Requ
 		return nil, fmt.Errorf("validation error: %w", err)
 	}
 
-	// Validate master data
-	if err := s.validateMasterData(ctx, req); err != nil {
+	// Validate master data and resolve block lineage for TBS details.
+	resolvedTBSBlockDetails, err := s.validateMasterData(ctx, req)
+	if err != nil {
 		return nil, err
 	}
 
@@ -84,9 +85,49 @@ func (s *PKSService) CreateTimbang1(ctx context.Context, req *CreateTimbang1Requ
 	pksTimbangan.Janjang = req.Janjang
 	pksTimbangan.Grade = req.Grade
 
-	// Save to database
-	if err := s.db.WithContext(ctx).Create(pksTimbangan).Error; err != nil {
-		return nil, fmt.Errorf("failed to create PKS timbangan: %w", err)
+	// Save transaction and detail rows atomically.
+	if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(pksTimbangan).Error; err != nil {
+			return fmt.Errorf("failed to create PKS timbangan: %w", err)
+		}
+
+		if len(resolvedTBSBlockDetails) > 0 {
+			details := make([]database.TimbanganPKSTBSBlockDetail, 0, len(resolvedTBSBlockDetails))
+			for i := range resolvedTBSBlockDetails {
+				details = append(details, database.TimbanganPKSTBSBlockDetail{
+					TimbanganPKSID: pksTimbangan.ID,
+					IDBlok:         resolvedTBSBlockDetails[i].IDBlok,
+					IDEstate:       resolvedTBSBlockDetails[i].IDEstate,
+					IDAfdeling:     resolvedTBSBlockDetails[i].IDAfdeling,
+					Janjang:        resolvedTBSBlockDetails[i].Janjang,
+					BrondolanKg:    resolvedTBSBlockDetails[i].BrondolanKg,
+				})
+			}
+
+			if err := tx.Create(&details).Error; err != nil {
+				return fmt.Errorf("failed to create TBS block details: %w", err)
+			}
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	// Load relationships for response parity.
+	if err := s.db.WithContext(ctx).
+		Preload("Produk").
+		Preload("Unit").
+		Preload("Supplier").
+		Preload("Estate").
+		Preload("Afdeling").
+		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
+		First(pksTimbangan, pksTimbangan.ID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load created PKS timbangan: %w", err)
 	}
 
 	return pksTimbangan, nil
@@ -175,6 +216,10 @@ func (s *PKSService) GetPendingTimbang2(ctx context.Context, limit int) ([]datab
 		Preload("Estate").
 		Preload("Afdeling").
 		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Where("status = ?", "timbang1").
 		Order("timbang1_date DESC")
 
@@ -199,6 +244,10 @@ func (s *PKSService) GetPendingCompletion(ctx context.Context, limit int) ([]dat
 		Preload("Estate").
 		Preload("Afdeling").
 		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Where("status = ?", "timbang2").
 		Order("timbang2_date DESC")
 
@@ -223,6 +272,10 @@ func (s *PKSService) GetPKSTimbanganByNoTransaksi(ctx context.Context, noTransak
 		Preload("Estate").
 		Preload("Afdeling").
 		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Preload("Officer1").
 		Preload("Officer2").
 		Where("no_transaksi = ?", noTransaksi).
@@ -247,6 +300,10 @@ func (s *PKSService) SearchPKSTimbangans(ctx context.Context, req *SearchPKSRequ
 		Preload("Estate").
 		Preload("Afdeling").
 		Preload("Blok").
+		Preload("TBSBlockDetails").
+		Preload("TBSBlockDetails.Blok").
+		Preload("TBSBlockDetails.Afdeling").
+		Preload("TBSBlockDetails.Estate").
 		Model(&database.TimbanganPKS{})
 
 	// Apply filters
@@ -364,6 +421,17 @@ func (s *PKSService) validateCreateTimbang1Request(req *CreateTimbang1Request) e
 	if req.Netto < 0 {
 		return ErrInvalidWeight
 	}
+	for i, detail := range req.TBSBlockDetails {
+		if detail.IDBlok == 0 {
+			return fmt.Errorf("detail blok TBS ke-%d: blok wajib diisi", i+1)
+		}
+		if detail.Janjang < 0 {
+			return fmt.Errorf("detail blok TBS ke-%d: janjang tidak boleh negatif", i+1)
+		}
+		if detail.BrondolanKg < 0 {
+			return fmt.Errorf("detail blok TBS ke-%d: brondolan tidak boleh negatif", i+1)
+		}
+	}
 	return nil
 }
 
@@ -383,81 +451,126 @@ func (s *PKSService) validateUpdateTimbang2Request(req *UpdateTimbang2Request) e
 	return nil
 }
 
-func (s *PKSService) validateMasterData(ctx context.Context, req *CreateTimbang1Request) error {
+type resolvedTBSBlockDetail struct {
+	IDBlok      uint
+	IDEstate    uint
+	IDAfdeling  uint
+	Janjang     int
+	BrondolanKg float64
+}
+
+func (s *PKSService) validateMasterData(ctx context.Context, req *CreateTimbang1Request) ([]resolvedTBSBlockDetail, error) {
 	// 1. Validate product and get category
 	var produk database.MasterProduk
 	if err := s.db.WithContext(ctx).
 		Where("id = ? AND is_active = ?", req.IDProduk, true).
 		First(&produk).Error; err != nil {
-		return fmt.Errorf("product not found or inactive")
+		return nil, fmt.Errorf("product not found or inactive")
 	}
 
 	// 2. Category-based validation
 	isTBS := produk.Kategori == "TBS"
+	resolvedDetails := make([]resolvedTBSBlockDetail, 0, len(req.TBSBlockDetails))
 
 	if isTBS {
 		// === TBS Product Validation ===
 
-		// Require Estate
-		if req.IDEstate == nil || *req.IDEstate == 0 {
-			return fmt.Errorf("estate wajib diisi untuk produk TBS")
-		}
-
-		// Require Afdeling (acts as supplier)
-		if req.IDAfdeling == nil || *req.IDAfdeling == 0 {
-			return fmt.Errorf("afdeling wajib diisi untuk produk TBS")
-		}
-
 		// Forbid Customer
 		if req.IDSupplier != nil && *req.IDSupplier != 0 {
-			return fmt.Errorf("customer tidak boleh diisi untuk produk TBS")
+			return nil, fmt.Errorf("customer tidak boleh diisi untuk produk TBS")
 		}
 
-		// Validate Estate exists
-		var estate database.MasterEstate
-		if err := s.db.WithContext(ctx).
-			Where("id = ? AND is_active = ?", *req.IDEstate, true).
-			First(&estate).Error; err != nil {
-			return fmt.Errorf("estate tidak ditemukan atau tidak aktif")
-		}
-
-		// Validate Afdeling exists and belongs to Estate
-		var afdeling database.MasterAfdeling
-		if err := s.db.WithContext(ctx).
-			Where("id = ? AND id_estate = ? AND is_active = ?",
-				*req.IDAfdeling, *req.IDEstate, true).
-			First(&afdeling).Error; err != nil {
-			return fmt.Errorf("afdeling tidak valid atau tidak termasuk estate yang dipilih")
-		}
-
-		// Validate Blok if provided (optional)
-		if req.IDBlok != nil && *req.IDBlok != 0 {
-			var blok database.MasterBlok
+		// Legacy header fields remain optional; validate when provided.
+		if req.IDEstate != nil && *req.IDEstate != 0 {
+			var estate database.MasterEstate
 			if err := s.db.WithContext(ctx).
-				Where("id = ? AND id_afdeling = ? AND is_active = ?",
-					*req.IDBlok, *req.IDAfdeling, true).
-				First(&blok).Error; err != nil {
-				return fmt.Errorf("blok tidak valid atau tidak termasuk afdeling yang dipilih")
+				Where("id = ? AND is_active = ?", *req.IDEstate, true).
+				First(&estate).Error; err != nil {
+				return nil, fmt.Errorf("estate tidak ditemukan atau tidak aktif")
 			}
 		}
 
+		if req.IDAfdeling != nil && *req.IDAfdeling != 0 {
+			var afdeling database.MasterAfdeling
+			query := s.db.WithContext(ctx).Where("id = ? AND is_active = ?", *req.IDAfdeling, true)
+			if req.IDEstate != nil && *req.IDEstate != 0 {
+				query = query.Where("id_estate = ?", *req.IDEstate)
+			}
+
+			if err := query.First(&afdeling).Error; err != nil {
+				if req.IDEstate != nil && *req.IDEstate != 0 {
+					return nil, fmt.Errorf("afdeling tidak valid atau tidak termasuk estate yang dipilih")
+				}
+				return nil, fmt.Errorf("afdeling tidak ditemukan atau tidak aktif")
+			}
+		}
+
+		// Legacy single blok is still optional.
+		if req.IDBlok != nil && *req.IDBlok != 0 {
+			var blok database.MasterBlok
+			query := s.db.WithContext(ctx).Where("id = ? AND is_active = ?", *req.IDBlok, true)
+			if req.IDAfdeling != nil && *req.IDAfdeling != 0 {
+				query = query.Where("id_afdeling = ?", *req.IDAfdeling)
+			}
+
+			if err := query.First(&blok).Error; err != nil {
+				if req.IDAfdeling != nil && *req.IDAfdeling != 0 {
+					return nil, fmt.Errorf("blok tidak valid atau tidak termasuk afdeling yang dipilih")
+				}
+				return nil, fmt.Errorf("blok tidak ditemukan atau tidak aktif")
+			}
+		}
+
+		seenBlockIDs := make(map[uint]struct{}, len(req.TBSBlockDetails))
+		for i, detail := range req.TBSBlockDetails {
+			if _, exists := seenBlockIDs[detail.IDBlok]; exists {
+				return nil, fmt.Errorf("detail blok TBS ke-%d: blok duplikat tidak diperbolehkan", i+1)
+			}
+			seenBlockIDs[detail.IDBlok] = struct{}{}
+
+			var blok database.MasterBlok
+			if err := s.db.WithContext(ctx).
+				Preload("Afdeling").
+				Where("id = ? AND is_active = ?", detail.IDBlok, true).
+				First(&blok).Error; err != nil {
+				return nil, fmt.Errorf("detail blok TBS ke-%d: blok tidak ditemukan atau tidak aktif", i+1)
+			}
+
+			var estate database.MasterEstate
+			if err := s.db.WithContext(ctx).
+				Where("id = ? AND is_active = ?", blok.Afdeling.IDEstate, true).
+				First(&estate).Error; err != nil {
+				return nil, fmt.Errorf("detail blok TBS ke-%d: estate induk blok tidak ditemukan atau tidak aktif", i+1)
+			}
+
+			resolvedDetails = append(resolvedDetails, resolvedTBSBlockDetail{
+				IDBlok:      detail.IDBlok,
+				IDEstate:    blok.Afdeling.IDEstate,
+				IDAfdeling:  blok.IDAfdeling,
+				Janjang:     detail.Janjang,
+				BrondolanKg: detail.BrondolanKg,
+			})
+		}
 	} else {
 		// === Non-TBS Product Validation ===
 
 		// Require Customer
 		if req.IDSupplier == nil || *req.IDSupplier == 0 {
-			return fmt.Errorf("customer wajib diisi untuk produk non-TBS")
+			return nil, fmt.Errorf("customer wajib diisi untuk produk non-TBS")
 		}
 
 		// Forbid TBS fields
 		if req.IDAfdeling != nil && *req.IDAfdeling != 0 {
-			return fmt.Errorf("afdeling tidak boleh diisi untuk produk non-TBS")
+			return nil, fmt.Errorf("afdeling tidak boleh diisi untuk produk non-TBS")
 		}
 		if req.IDEstate != nil && *req.IDEstate != 0 {
-			return fmt.Errorf("estate tidak boleh diisi untuk produk non-TBS")
+			return nil, fmt.Errorf("estate tidak boleh diisi untuk produk non-TBS")
 		}
 		if req.IDBlok != nil && *req.IDBlok != 0 {
-			return fmt.Errorf("blok tidak boleh diisi untuk produk non-TBS")
+			return nil, fmt.Errorf("blok tidak boleh diisi untuk produk non-TBS")
+		}
+		if len(req.TBSBlockDetails) > 0 {
+			return nil, fmt.Errorf("detail blok TBS tidak boleh diisi untuk produk non-TBS")
 		}
 
 		// Validate Customer exists
@@ -465,7 +578,7 @@ func (s *PKSService) validateMasterData(ctx context.Context, req *CreateTimbang1
 		if err := s.db.WithContext(ctx).
 			Where("id = ? AND is_active = ?", *req.IDSupplier, true).
 			First(&supplier).Error; err != nil {
-			return fmt.Errorf("customer tidak ditemukan atau tidak aktif")
+			return nil, fmt.Errorf("customer tidak ditemukan atau tidak aktif")
 		}
 	}
 
@@ -474,29 +587,36 @@ func (s *PKSService) validateMasterData(ctx context.Context, req *CreateTimbang1
 	if err := s.db.WithContext(ctx).
 		Where("id = ? AND is_active = ?", req.IDUnit, true).
 		First(&unit).Error; err != nil {
-		return fmt.Errorf("unit tidak ditemukan atau tidak aktif")
+		return nil, fmt.Errorf("unit tidak ditemukan atau tidak aktif")
 	}
 
-	return nil
+	return resolvedDetails, nil
 }
 
 // Request/Response DTOs
 
 type CreateTimbang1Request struct {
-	NoTransaksi string  `json:"noTransaksi"`
-	IDProduk    uint    `json:"idProduk"`
-	IDUnit      uint    `json:"idUnit"`
-	IDSupplier  *uint   `json:"idSupplier"` // Nullable: required for non-TBS (Customer), null for TBS products
-	DriverName  string  `json:"driverName"`
-	IDEstate    *uint   `json:"idEstate"`
-	IDAfdeling  *uint   `json:"idAfdeling"`  // Acts as supplier source for TBS products
-	IDBlok      *uint   `json:"idBlok"`
-	SumberTBS   string  `json:"sumberTbs"`
-	Janjang     string  `json:"janjang"`
-	Grade       string  `json:"grade"`
-	Bruto       float64 `json:"bruto"`
-	Tara        float64 `json:"tara"`
-	Netto       float64 `json:"netto"`
+	NoTransaksi     string                            `json:"noTransaksi"`
+	IDProduk        uint                              `json:"idProduk"`
+	IDUnit          uint                              `json:"idUnit"`
+	IDSupplier      *uint                             `json:"idSupplier"` // Nullable: required for non-TBS (Customer), null for TBS products
+	DriverName      string                            `json:"driverName"`
+	IDEstate        *uint                             `json:"idEstate"`
+	IDAfdeling      *uint                             `json:"idAfdeling"` // Optional for TBS when source is detail blocks
+	IDBlok          *uint                             `json:"idBlok"`
+	SumberTBS       string                            `json:"sumberTbs"`
+	Janjang         string                            `json:"janjang"`
+	Grade           string                            `json:"grade"`
+	TBSBlockDetails []CreateTBSBlockDetailRequestItem `json:"tbsBlockDetails,omitempty"`
+	Bruto           float64                           `json:"bruto"`
+	Tara            float64                           `json:"tara"`
+	Netto           float64                           `json:"netto"`
+}
+
+type CreateTBSBlockDetailRequestItem struct {
+	IDBlok      uint    `json:"idBlok"`
+	Janjang     int     `json:"janjang"`
+	BrondolanKg float64 `json:"brondolanKg"`
 }
 
 type UpdateTimbang2Request struct {

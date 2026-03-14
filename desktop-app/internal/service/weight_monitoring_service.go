@@ -221,8 +221,6 @@ func (s *WeightMonitoringService) IsConnected() bool {
 // Subscribe to weight events
 func (s *WeightMonitoringService) Subscribe(id string) <-chan WeightEvent {
 	s.subscriberMu.Lock()
-	defer s.subscriberMu.Unlock()
-
 	// Close existing channel if any to prevent leaks
 	if oldChan, exists := s.subscribers[id]; exists {
 		close(oldChan)
@@ -231,14 +229,18 @@ func (s *WeightMonitoringService) Subscribe(id string) <-chan WeightEvent {
 	eventChan := make(chan WeightEvent, 100)
 	s.subscribers[id] = eventChan
 
-	// Send current status immediately
-	go func() {
-		eventChan <- WeightEvent{
-			Type:      "connection_change",
-			Reading:   s.GetCurrentWeight(),
-			Timestamp: time.Now(),
-		}
-	}()
+	// Send current status immediately while subscriber map is locked.
+	// This avoids racing with unsubscribe/remove paths that may close the channel.
+	select {
+	case eventChan <- WeightEvent{
+		Type:      "connection_change",
+		Reading:   s.GetCurrentWeight(),
+		Timestamp: time.Now(),
+	}:
+	default:
+	}
+
+	s.subscriberMu.Unlock()
 
 	return eventChan
 }

@@ -78,6 +78,7 @@ func runMigrations(db *gorm.DB) error {
 		&MasterAfdeling{},
 		&MasterBlok{},
 		&TimbanganPKS{},
+		&TimbanganPKSTBSBlockDetail{},
 
 		&PKSTicket{},
 
@@ -204,6 +205,14 @@ func createIndexes(db *gorm.DB) error {
 
 	if err := db.Exec("CREATE INDEX IF NOT EXISTS idx_timbangan_pks_sync ON timbangan_pks(is_synced, id_sync)").Error; err != nil {
 		return fmt.Errorf("failed to create timbangan pks sync index: %w", err)
+	}
+
+	if err := db.Exec("CREATE INDEX IF NOT EXISTS idx_timbangan_pks_tbs_detail_tx ON timbangan_pks_tbs_block_details(timbangan_pks_id)").Error; err != nil {
+		return fmt.Errorf("failed to create timbangan pks tbs detail tx index: %w", err)
+	}
+
+	if err := db.Exec("CREATE INDEX IF NOT EXISTS idx_timbangan_pks_tbs_detail_refs ON timbangan_pks_tbs_block_details(id_blok, id_afdeling, id_estate)").Error; err != nil {
+		return fmt.Errorf("failed to create timbangan pks tbs detail refs index: %w", err)
 	}
 
 	log.Println("Database indexes created successfully")

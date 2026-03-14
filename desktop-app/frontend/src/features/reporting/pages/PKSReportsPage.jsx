@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {
     Box,
-    Container,
     Grid,
     Paper,
     Typography,
@@ -18,8 +17,7 @@ import {
     TextField,
     MenuItem,
     Drawer,
-    Divider,
-    useTheme
+    Divider
 } from '@mui/material'
 import {
     BarChart,
@@ -50,8 +48,6 @@ import {
 } from 'lucide-react'
 
 import { useReportStore } from '../store/useReportStore'
-import { useAuthStore } from '../../auth'
-
 // Custom Tab Panel Component
 function CustomTabPanel(props) {
     const { children, value, index, ...other } = props
@@ -75,30 +71,14 @@ function CustomTabPanel(props) {
 }
 
 const PKSReportsPage = ({ wails }) => {
-    const theme = useTheme()
-    const { user } = useAuthStore()
-
     // Store state
     const {
         activeTab,
         setActiveTab,
-        isLoading,
-        isGenerating,
-        reportData,
-        reportSummary,
         transactions,
         filters,
         updateFilters,
-        generateReport,
-        generateReportSummary,
-        exportToCSV,
-        exportToExcel,
-        datePresets,
-        loadDatePresets,
-        filterOptions,
-        loadFilterOptions,
-        resetFilters,
-        validation
+        resetFilters
     } = useReportStore()
 
     // Local state
@@ -165,15 +145,19 @@ const PKSReportsPage = ({ wails }) => {
     // Columns for DataGrid
     const columns = [
         { field: 'noTransaksi', headerName: 'No. Transaksi', width: 150 },
-        { field: 'date', headerName: 'Tanggal', width: 120 },
-        { field: 'time', headerName: 'Waktu', width: 100 },
+        {
+            field: 'timbang1Date',
+            headerName: 'Tanggal Timbang 1',
+            width: 180,
+            renderCell: (params) => params.value ? new Date(params.value).toLocaleString('id-ID') : '-'
+        },
         { field: 'nomorKendaraan', headerName: 'No. Polisi', width: 120 },
         { field: 'supplierName', headerName: 'Supplier', width: 200 },
+        { field: 'sourceSummary', headerName: 'Sumber TBS', width: 180 },
         { field: 'productName', headerName: 'Produk', width: 150 },
-        { field: 'beratMasuk', headerName: 'Berat Masuk (kg)', width: 150, type: 'number' },
-        { field: 'beratKeluar', headerName: 'Berat Keluar (kg)', width: 150, type: 'number' },
+        { field: 'bruto', headerName: 'Bruto (kg)', width: 130, type: 'number' },
         { field: 'netto', headerName: 'Netto (kg)', width: 150, type: 'number' },
-        { field: 'potongan', headerName: 'Potongan (%)', width: 120, type: 'number' },
+        { field: 'netto2', headerName: 'Netto 2 (kg)', width: 150, type: 'number' },
         { field: 'grade', headerName: 'Grade', width: 100 },
         {
             field: 'status',
@@ -182,7 +166,7 @@ const PKSReportsPage = ({ wails }) => {
             renderCell: (params) => (
                 <Chip
                     label={params.value}
-                    color={params.value === 'COMPLETED' ? 'success' : 'default'}
+                    color={params.value === 'selesai' ? 'success' : 'default'}
                     size="small"
                 />
             )
@@ -190,9 +174,9 @@ const PKSReportsPage = ({ wails }) => {
     ]
 
     return (
-        <Box sx={{ height: 'calc(100vh - 100px)', display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{ minHeight: 'min(72vh, 860px)', display: 'flex', flexDirection: 'column', gap: 2 }}>
             {/* Header */}
-            <Paper sx={{ p: 2, mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Paper sx={{ p: 2, display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: 2 }}>
                 <Box>
                     <Typography variant="h5" component="h1" fontWeight="bold">
                         Laporan PKS
@@ -201,7 +185,7 @@ const PKSReportsPage = ({ wails }) => {
                         Analisis transaksi, tren, dan performa operasional
                     </Typography>
                 </Box>
-                <Stack direction="row" spacing={2}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                     <Button
                         variant="outlined"
                         startIcon={<Filter size={18} />}
@@ -230,7 +214,7 @@ const PKSReportsPage = ({ wails }) => {
             {/* Main Content */}
             <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <Tabs value={tabValue} onChange={handleTabChange} aria-label="report tabs">
+                    <Tabs value={tabValue} onChange={handleTabChange} aria-label="report tabs" variant="scrollable" scrollButtons="auto">
                         <Tab icon={<PieChartIcon size={18} />} iconPosition="start" label="Ringkasan" />
                         <Tab icon={<List size={18} />} iconPosition="start" label="Detail Transaksi" />
                         <Tab icon={<TrendingUp size={18} />} iconPosition="start" label="Tren & Analisis" />
@@ -242,7 +226,7 @@ const PKSReportsPage = ({ wails }) => {
                 <CustomTabPanel value={tabValue} index={0}>
                     <Grid container spacing={3}>
                         {/* Key Metrics */}
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={6} xl={3}>
                             <Card sx={{ height: '100%' }}>
                                 <CardContent>
                                     <Typography color="text.secondary" gutterBottom>Total Transaksi</Typography>
@@ -251,7 +235,7 @@ const PKSReportsPage = ({ wails }) => {
                                 </CardContent>
                             </Card>
                         </Grid>
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={6} xl={3}>
                             <Card sx={{ height: '100%' }}>
                                 <CardContent>
                                     <Typography color="text.secondary" gutterBottom>Total Netto (Ton)</Typography>
@@ -260,7 +244,7 @@ const PKSReportsPage = ({ wails }) => {
                                 </CardContent>
                             </Card>
                         </Grid>
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={6} xl={3}>
                             <Card sx={{ height: '100%' }}>
                                 <CardContent>
                                     <Typography color="text.secondary" gutterBottom>Rata-rata Potongan</Typography>
@@ -269,7 +253,7 @@ const PKSReportsPage = ({ wails }) => {
                                 </CardContent>
                             </Card>
                         </Grid>
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={6} xl={3}>
                             <Card sx={{ height: '100%' }}>
                                 <CardContent>
                                     <Typography color="text.secondary" gutterBottom>Waktu Rata-rata</Typography>
@@ -280,8 +264,8 @@ const PKSReportsPage = ({ wails }) => {
                         </Grid>
 
                         {/* Charts */}
-                        <Grid item xs={12} md={8}>
-                            <Card sx={{ height: 400 }}>
+                        <Grid item xs={12} xl={8}>
+                            <Card sx={{ height: { xs: 320, xl: 400 } }}>
                                 <CardContent sx={{ height: '100%' }}>
                                     <Typography variant="h6" gutterBottom>Volume Harian (Ton)</Typography>
                                     <ResponsiveContainer width="100%" height="90%">
@@ -297,8 +281,8 @@ const PKSReportsPage = ({ wails }) => {
                                 </CardContent>
                             </Card>
                         </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Card sx={{ height: 400 }}>
+                        <Grid item xs={12} xl={4}>
+                            <Card sx={{ height: { xs: 320, xl: 400 } }}>
                                 <CardContent sx={{ height: '100%' }}>
                                     <Typography variant="h6" gutterBottom>Komposisi Grade</Typography>
                                     <ResponsiveContainer width="100%" height="90%">
@@ -326,7 +310,7 @@ const PKSReportsPage = ({ wails }) => {
 
                 {/* Details Tab */}
                 <CustomTabPanel value={tabValue} index={1}>
-                    <Box sx={{ height: '100%', width: '100%' }}>
+                    <Box sx={{ height: 'clamp(400px, 52vh, 560px)', width: '100%', overflowX: 'auto' }}>
                         <DataGrid
                             rows={transactions || []}
                             columns={columns}
@@ -341,6 +325,8 @@ const PKSReportsPage = ({ wails }) => {
                             initialState={{
                                 pagination: { paginationModel: { pageSize: 25 } },
                             }}
+                            density="compact"
+                            sx={{ minWidth: 1480 }}
                         />
                     </Box>
                 </CustomTabPanel>
@@ -364,7 +350,7 @@ const PKSReportsPage = ({ wails }) => {
                 open={isFilterOpen}
                 onClose={() => setIsFilterOpen(false)}
             >
-                <Box sx={{ width: 350, p: 3 }}>
+                <Box sx={{ width: { xs: '100vw', sm: 380 }, maxWidth: '100vw', p: 3 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                         <Typography variant="h6">Filter Laporan</Typography>
                         <IconButton onClick={() => setIsFilterOpen(false)}>

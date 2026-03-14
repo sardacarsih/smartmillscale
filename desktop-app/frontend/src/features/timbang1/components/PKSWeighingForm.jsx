@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useState } from 'react'
 import usePKSStore from '../store/usePKSStore'
 import { useWailsService } from '../../../shared/contexts/WailsContext'
 import { CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react'
@@ -8,7 +8,6 @@ import TransactionHeaderSection from './TransactionHeaderSection'
 import InlineFormField from './InlineFormField'
 import TBSBlockModal from '../../../components/TBSBlockModal'
 import SearchableDropdown from '../../../shared/components/SearchableDropdown'
-import FormField from '../../../shared/components/FormField'
 
 const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = true, currentUser, wails }) => {
   const pksService = useWailsService('pks')
@@ -66,8 +65,12 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
 
     // Clear conflicting fields based on product type
     if (isTBSProduct) {
-      // TBS: Clear customer (will use afdeling instead)
+      // TBS: Clear customer and legacy single-source fields.
       updateTransactionForm('idSupplier', '')
+      updateTransactionForm('idEstate', '')
+      updateTransactionForm('idAfdeling', '')
+      updateTransactionForm('idBlok', '')
+      updateTransactionForm('janjang', '')
     } else {
       // Non-TBS: Clear all TBS-specific fields
       updateTransactionForm('idEstate', '')
@@ -113,17 +116,19 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
       const isTBSProduct = product?.kategori === 'TBS'
 
       if (isTBSProduct) {
-        if (!transactionForm.idEstate) {
+        const hasInvalidTBSDetail = (transactionForm.tbsBlocks || []).some((item) => {
+          if (!item?.idBlok) {
+            return true
+          }
+          const janjang = Number(item.janjang)
+          const brondolan = Number(item.brondolanKg ?? 0)
+          return !Number.isInteger(janjang) || janjang < 0 || Number.isNaN(brondolan) || brondolan < 0
+        })
+
+        if (hasInvalidTBSDetail) {
           setNotification({
             type: 'error',
-            message: 'Estate wajib diisi untuk produk TBS'
-          })
-          return
-        }
-        if (!transactionForm.idAfdeling) {
-          setNotification({
-            type: 'error',
-            message: 'Afdeling wajib diisi untuk produk TBS'
+            message: 'Detail blok TBS tidak valid. Pastikan setiap blok memiliki janjang valid dan brondolan tidak negatif.'
           })
           return
         }
@@ -179,24 +184,9 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
     setShowTBSFields(false)
   }
 
-  // Cascading dropdown filters - Afdeling filtered by Estate, Blok filtered by Afdeling
-  const filteredAfdelings = useMemo(() => {
-    if (!transactionForm.idEstate || !masterData?.afdelings) return []
-    return masterData.afdelings.filter(
-      afd => afd.id_estate === parseInt(transactionForm.idEstate)
-    )
-  }, [transactionForm.idEstate, masterData?.afdelings])
-
-  const filteredBlocks = useMemo(() => {
-    if (!transactionForm.idAfdeling || !masterData?.blocks) return []
-    return masterData.blocks.filter(
-      blok => blok.id_afdeling === parseInt(transactionForm.idAfdeling)
-    )
-  }, [transactionForm.idAfdeling, masterData?.blocks])
-
   return (
     <>
-      <div className="bg-gray-800 rounded-lg shadow-xl p-6">
+      <div className="rounded-xl bg-gray-800 shadow-xl">
         {/* Header with mode indicator and back button */}
         {isTimbang2 && (
           <div className="flex items-center gap-3 mb-6">
@@ -216,9 +206,9 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
 
         {/* Transaction Summary (Timbang2 mode only) */}
         {isTimbang2 && currentTransaction && (
-          <div className="bg-gray-900 rounded-lg p-4 mb-6">
+          <div className="mb-6 rounded-xl bg-gray-900 p-4">
             <h3 className="text-lg font-medium text-gray-300 mb-3">Informasi Transaksi</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
               <div>
                 <span className="text-gray-400">No. Transaksi:</span>
                 <span className="ml-2 text-white font-medium">{currentTransaction.noTransaksi}</span>
@@ -240,7 +230,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
             {/* Timbang 1 Data */}
             <div className="mt-4 pt-4 border-t border-gray-700">
               <h4 className="text-md font-medium text-gray-300 mb-2">Data Timbang 1</h4>
-              <div className="grid grid-cols-3 gap-4 text-sm">
+              <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
                 <div>
                   <span className="text-gray-400">Bruto:</span>
                   <span className="ml-2 text-white font-medium">{currentTransaction.bruto} kg</span>
@@ -315,7 +305,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
                   </InlineFormField>
 
                   {/* Unit & Driver Name - Same Row */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
                     {/* Unit */}
                     <InlineFormField label="Unit/Kendaraan" required>
                       <SearchableDropdown
@@ -345,71 +335,20 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
                     </InlineFormField>
                   </div>
 
-                  {/* CONDITIONAL: Supplier for non-TBS, Estate+Afdeling for TBS */}
+                  {/* CONDITIONAL: Supplier for non-TBS, optional block-detail flow for TBS */}
                   {showTBSFields ? (
-                    // === TBS Product: Show Estate + Afdeling (replaces Supplier) ===
+                    // === TBS Product: Detail blok jadi sumber utama (opsional) ===
                     <div className="space-y-4 border border-green-900/30 rounded-lg p-4 bg-green-900/10">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">🌴</span>
                         <h3 className="text-md font-medium text-gray-300">
-                          Sumber TBS (Estate & Afdeling)
+                          Detail Blok TBS (Opsional)
                         </h3>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        {/* Estate */}
-                        <InlineFormField label="Estate" required>
-                          <SearchableDropdown
-                            options={masterData?.estates || []}
-                            value={transactionForm.idEstate}
-                            onChange={(value) => {
-                              updateTransactionForm('idEstate', value)
-                              updateTransactionForm('idAfdeling', '') // Clear dependent field
-                            }}
-                            placeholder="Pilih Estate"
-                            getOptionLabel={(estate) => `${estate.kode_estate} - ${estate.nama_estate}`}
-                            getOptionValue={(estate) => estate.id}
-                            disabled={isSubmitting}
-                            required
-                            isLoading={loadingMasterData}
-                          />
-                        </InlineFormField>
-
-                        {/* Afdeling (filtered by Estate) */}
-                        <InlineFormField label="Afdeling" required>
-                          <SearchableDropdown
-                            options={
-                              transactionForm.idEstate
-                                ? masterData?.afdelings?.filter(
-                                    afd => afd.id_estate.toString() === transactionForm.idEstate
-                                  ) || []
-                                : []
-                            }
-                            value={transactionForm.idAfdeling}
-                            onChange={(value) => updateTransactionForm('idAfdeling', value)}
-                            placeholder="Pilih Afdeling"
-                            getOptionLabel={(afdeling) => {
-                              const estateName = masterData?.estates?.find(
-                                e => e.id === afdeling.id_estate
-                              )?.nama_estate || ''
-                              return `${estateName} - ${afdeling.nama_afdeling}`
-                            }}
-                            getOptionValue={(afdeling) => afdeling.id}
-                            disabled={isSubmitting || !transactionForm.idEstate}
-                            required
-                            isLoading={loadingMasterData}
-                            noOptionsMessage={
-                              !transactionForm.idEstate
-                                ? "Pilih Estate terlebih dahulu"
-                                : "Tidak ada afdeling untuk estate ini"
-                            }
-                          />
-                        </InlineFormField>
                       </div>
 
                       <p className="text-sm text-green-400/80 italic flex items-center gap-1">
                         <span>💡</span>
-                        <span>Afdeling berfungsi sebagai sumber pasokan untuk produk TBS</span>
+                        <span>Pilih blok langsung dari master blok. Estate/Afdeling akan diturunkan otomatis dari blok yang dipilih.</span>
                       </p>
                     </div>
                   ) : (
@@ -435,41 +374,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
                     <div className="border-t border-gray-700 pt-4 space-y-4">
                       <h3 className="text-lg font-medium text-gray-300">Data Tambahan TBS</h3>
 
-                      <div className="grid grid-cols-4 gap-4">
-                        {/* Blok (Optional) */}
-                        <FormField label="Blok (Opsional)">
-                          <SearchableDropdown
-                            options={
-                              transactionForm.idAfdeling
-                                ? masterData?.bloks?.filter(
-                                    blok => blok.id_afdeling.toString() === transactionForm.idAfdeling
-                                  ) || []
-                                : []
-                            }
-                            value={transactionForm.idBlok}
-                            onChange={(value) => updateTransactionForm('idBlok', value)}
-                            placeholder="Pilih Blok"
-                            getOptionLabel={(blok) => `${blok.kode_blok} - ${blok.nama_blok}`}
-                            getOptionValue={(blok) => blok.id}
-                            disabled={isSubmitting || !transactionForm.idAfdeling}
-                            isLoading={loadingMasterData}
-                          />
-                        </FormField>
-
-                        {/* Janjang */}
-                        <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Janjang
-                          </label>
-                          <input
-                            type="text"
-                            value={transactionForm.janjang || ''}
-                            onChange={(e) => updateTransactionForm('janjang', e.target.value)}
-                            placeholder="Jenis janjang"
-                            className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
-                            disabled={isSubmitting}
-                          />
-                        </div>
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
                         {/* Grade */}
                         <div>
@@ -517,9 +422,35 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
                           Input Data per Blok TBS
                         </button>
                         {transactionForm.tbsBlocks && transactionForm.tbsBlocks.length > 0 && (
-                          <div className="mt-2 text-sm text-gray-300">
-                            Data blok TBS telah diinput ({transactionForm.tbsBlocks.length} blok)
-                          </div>
+                          <>
+                            <div className="mt-2 text-sm text-gray-300">
+                              Data blok TBS telah diinput ({transactionForm.tbsBlocks.length} blok)
+                            </div>
+                            <div className="mt-3 overflow-x-auto">
+                              <table className="min-w-full text-xs text-gray-300 border border-gray-700 rounded">
+                                <thead className="bg-gray-800">
+                                  <tr>
+                                    <th className="px-3 py-2 text-left">Blok</th>
+                                    <th className="px-3 py-2 text-left">Estate</th>
+                                    <th className="px-3 py-2 text-left">Afdeling</th>
+                                    <th className="px-3 py-2 text-right">Janjang</th>
+                                    <th className="px-3 py-2 text-right">Brondolan (kg)</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {transactionForm.tbsBlocks.map((block, idx) => (
+                                    <tr key={`${block.idBlok}-${idx}`} className="border-t border-gray-700">
+                                      <td className="px-3 py-2">{`${block.kodeBlok || '-'} - ${block.namaBlok || '-'}`}</td>
+                                      <td className="px-3 py-2">{block.namaEstate || '-'}</td>
+                                      <td className="px-3 py-2">{block.namaAfdeling || '-'}</td>
+                                      <td className="px-3 py-2 text-right">{block.janjang}</td>
+                                      <td className="px-3 py-2 text-right">{Number(block.brondolanKg || 0).toFixed(2)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </>
                         )}
                       </div>
                     </div>
@@ -529,7 +460,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
                   <div className="border-t border-gray-700 pt-4">
                     <h3 className="text-lg font-medium text-gray-300 mb-4">Informasi Berat</h3>
 
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                       {/* Timbang1 */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -581,7 +512,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
                   <div>
                     <h3 className="text-lg font-medium text-gray-300 mb-4">Informasi Berat Timbang 2</h3>
 
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       {/* Bruto 2 */}
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -683,7 +614,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
               </div>
 
               {/* Weight Comparison */}
-              <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
                 <div className="bg-gray-900 rounded p-4">
                   <h4 className="text-sm font-medium text-gray-400 mb-2">Timbang 1</h4>
                   <div className="space-y-1 text-sm">
@@ -736,7 +667,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex flex-col gap-4 xl:flex-row">
               <button
                 onClick={() => setShowCompletion(false)}
                 className="flex-1 py-3 px-4 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
@@ -783,6 +714,7 @@ const PKSWeighingForm = ({ currentWeight, isStable, isConnected, isMonitoring = 
         onClose={hideTBSBlockModal}
         onSubmit={handleTBSBlocksSubmit}
         blocks={transactionForm.tbsBlocks}
+        masterBlocks={masterData?.blocks || []}
       />
     </>
   )

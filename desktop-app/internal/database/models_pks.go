@@ -108,8 +108,9 @@ type MasterEstate struct {
 	UpdatedAt       time.Time  `json:"updated_at"`
 
 	// Relationships
-	Afdelings     []MasterAfdeling `gorm:"foreignKey:IDEstate" json:"afdelings,omitempty"`
-	TimbangansPKS []TimbanganPKS   `gorm:"foreignKey:IDEstate" json:"timbangans_pks,omitempty"`
+	Afdelings      []MasterAfdeling             `gorm:"foreignKey:IDEstate" json:"afdelings,omitempty"`
+	TimbangansPKS  []TimbanganPKS               `gorm:"foreignKey:IDEstate" json:"timbangans_pks,omitempty"`
+	TBSBlockDetail []TimbanganPKSTBSBlockDetail `gorm:"foreignKey:IDEstate" json:"tbs_block_details,omitempty"`
 }
 
 // TableName specifies the table name for MasterEstate
@@ -132,9 +133,10 @@ type MasterAfdeling struct {
 	UpdatedAt       time.Time  `json:"updated_at"`
 
 	// Relationships
-	Estate        MasterEstate   `gorm:"foreignKey:IDEstate" json:"estate"`
-	Bloks         []MasterBlok   `gorm:"foreignKey:IDAfdeling" json:"bloks,omitempty"`
-	TimbangansPKS []TimbanganPKS `gorm:"foreignKey:IDAfdeling" json:"timbangans_pks,omitempty"`
+	Estate         MasterEstate                 `gorm:"foreignKey:IDEstate" json:"estate"`
+	Bloks          []MasterBlok                 `gorm:"foreignKey:IDAfdeling" json:"bloks,omitempty"`
+	TimbangansPKS  []TimbanganPKS               `gorm:"foreignKey:IDAfdeling" json:"timbangans_pks,omitempty"`
+	TBSBlockDetail []TimbanganPKSTBSBlockDetail `gorm:"foreignKey:IDAfdeling" json:"tbs_block_details,omitempty"`
 }
 
 // TableName specifies the table name for MasterAfdeling
@@ -157,8 +159,9 @@ type MasterBlok struct {
 	UpdatedAt       time.Time  `json:"updated_at"`
 
 	// Relationships
-	Afdeling      MasterAfdeling `gorm:"foreignKey:IDAfdeling" json:"afdeling"`
-	TimbangansPKS []TimbanganPKS `gorm:"foreignKey:IDBlok" json:"timbangans_pks,omitempty"`
+	Afdeling       MasterAfdeling               `gorm:"foreignKey:IDAfdeling" json:"afdeling"`
+	TimbangansPKS  []TimbanganPKS               `gorm:"foreignKey:IDBlok" json:"timbangans_pks,omitempty"`
+	TBSBlockDetail []TimbanganPKSTBSBlockDetail `gorm:"foreignKey:IDBlok" json:"tbs_block_details,omitempty"`
 }
 
 // TableName specifies the table name for MasterBlok
@@ -215,11 +218,36 @@ type TimbanganPKS struct {
 	Estate   *MasterEstate   `gorm:"foreignKey:IDEstate" json:"estate"`
 	Afdeling *MasterAfdeling `gorm:"foreignKey:IDAfdeling" json:"afdeling"`
 	Blok     *MasterBlok     `gorm:"foreignKey:IDBlok" json:"blok"`
-	Officer1 auth.User       `gorm:"foreignKey:Officer1ID" json:"officer1"`
-	Officer2 *auth.User      `gorm:"foreignKey:Officer2ID" json:"officer2"`
+	// Optional multi-block breakdown for TBS transactions.
+	TBSBlockDetails []TimbanganPKSTBSBlockDetail `gorm:"foreignKey:TimbanganPKSID" json:"tbs_block_details,omitempty"`
+	Officer1        auth.User                    `gorm:"foreignKey:Officer1ID" json:"officer1"`
+	Officer2        *auth.User                   `gorm:"foreignKey:Officer2ID" json:"officer2"`
 
 	// Sync relationships (disabled - incompatible types: TimbanganPKS.ID is uint but SyncQueue.EntityID is UUID)
 	SyncQueueItems []SyncQueue `gorm:"-" json:"sync_queue_items,omitempty"`
+}
+
+// TimbanganPKSTBSBlockDetail stores per-block TBS composition in a single transaction.
+type TimbanganPKSTBSBlockDetail struct {
+	ID             uint      `gorm:"primaryKey" json:"id"`
+	TimbanganPKSID uint      `gorm:"not null;index;uniqueIndex:idx_timbang_pks_block_unique" json:"timbangan_pks_id"`
+	IDBlok         uint      `gorm:"not null;index;uniqueIndex:idx_timbang_pks_block_unique" json:"id_blok"`
+	IDEstate       uint      `gorm:"not null;index" json:"id_estate"`
+	IDAfdeling     uint      `gorm:"not null;index" json:"id_afdeling"`
+	Janjang        int       `gorm:"not null;default:0" json:"janjang"`
+	BrondolanKg    float64   `gorm:"type:decimal(10,2);not null;default:0" json:"brondolan_kg"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+
+	TimbanganPKS TimbanganPKS   `gorm:"foreignKey:TimbanganPKSID;constraint:OnDelete:CASCADE" json:"-"`
+	Blok         MasterBlok     `gorm:"foreignKey:IDBlok" json:"blok"`
+	Estate       MasterEstate   `gorm:"foreignKey:IDEstate" json:"estate"`
+	Afdeling     MasterAfdeling `gorm:"foreignKey:IDAfdeling" json:"afdeling"`
+}
+
+// TableName specifies the table name for TimbanganPKSTBSBlockDetail.
+func (TimbanganPKSTBSBlockDetail) TableName() string {
+	return "timbangan_pks_tbs_block_details"
 }
 
 // TableName specifies the table name for TimbanganPKS

@@ -104,7 +104,7 @@ const usePKSStore = create((set, get) => ({
     sumberTBS: '',
     janjang: '',
     grade: '',
-    tbsBlocks: [], // Array of { blok: 'A', janjang: 0, berat: 0 }
+    tbsBlocks: [], // Array of { idBlok, kodeBlok, namaBlok, idEstate, idAfdeling, janjang, brondolanKg }
     bruto: 0,
     tara: 0,
     netto: 0,
@@ -325,6 +325,8 @@ const usePKSStore = create((set, get) => ({
         idUnit: '',
         driverName: '',
         idSupplier: '',
+        idEstate: '',
+        idAfdeling: '',
         idBlok: '',
         sumberTBS: '',
         janjang: '',

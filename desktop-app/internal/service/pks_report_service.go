@@ -14,11 +14,11 @@ import (
 
 // PKSReportService handles business logic for PKS reporting
 type PKSReportService struct {
-	db         *gorm.DB
-	repo       *repository.PKSReportRepository
-	deviceID   string
-	cache      sync.Map // Simple in-memory cache
-	cacheTTL   time.Duration
+	db       *gorm.DB
+	repo     *repository.PKSReportRepository
+	deviceID string
+	cache    sync.Map // Simple in-memory cache
+	cacheTTL time.Duration
 }
 
 // NewPKSReportService creates a new instance of PKS Report Service
@@ -276,6 +276,7 @@ func (s *PKSReportService) GetTransactionDetails(ctx context.Context, dateRange 
 			ProductName:    productName,
 			ProductCode:    productCode,
 			ProductID:      productID,
+			SourceSummary:  s.resolveSourceSummary(tx),
 			Grade:          tx.Grade,
 			QualityGrade:   tx.Grade, // Assuming Grade and QualityGrade are the same
 			Bruto:          tx.Bruto,
@@ -554,6 +555,7 @@ func (s *PKSReportService) convertToTransactionDetail(tx database.TimbanganPKS) 
 		ProductName:    productName,
 		ProductCode:    productCode,
 		ProductID:      productID,
+		SourceSummary:  s.resolveSourceSummary(tx),
 		Grade:          tx.Grade,
 		QualityGrade:   tx.Grade,
 		Bruto:          tx.Bruto,
@@ -571,6 +573,56 @@ func (s *PKSReportService) convertToTransactionDetail(tx database.TimbanganPKS) 
 		UpdatedAt:      tx.UpdatedAt,
 		SyncedAt:       tx.SyncedAt,
 	}
+}
+
+func (s *PKSReportService) resolveSourceSummary(tx database.TimbanganPKS) string {
+	detailCount := len(tx.TBSBlockDetails)
+	if detailCount > 1 {
+		return fmt.Sprintf("Campuran (%d blok)", detailCount)
+	}
+
+	if detailCount == 1 {
+		detail := tx.TBSBlockDetails[0]
+		if detail.Blok.KodeBlok != "" && detail.Blok.NamaBlok != "" {
+			return fmt.Sprintf("%s - %s", detail.Blok.KodeBlok, detail.Blok.NamaBlok)
+		}
+		if detail.Blok.NamaBlok != "" {
+			return detail.Blok.NamaBlok
+		}
+		if detail.Blok.KodeBlok != "" {
+			return detail.Blok.KodeBlok
+		}
+		return fmt.Sprintf("Blok #%d", detail.IDBlok)
+	}
+
+	if tx.Blok != nil {
+		if tx.Blok.KodeBlok != "" && tx.Blok.NamaBlok != "" {
+			return fmt.Sprintf("%s - %s", tx.Blok.KodeBlok, tx.Blok.NamaBlok)
+		}
+		if tx.Blok.NamaBlok != "" {
+			return tx.Blok.NamaBlok
+		}
+		if tx.Blok.KodeBlok != "" {
+			return tx.Blok.KodeBlok
+		}
+	}
+
+	if tx.Afdeling != nil && tx.Afdeling.NamaAfdeling != "" {
+		if tx.Estate != nil && tx.Estate.NamaEstate != "" {
+			return fmt.Sprintf("%s / %s", tx.Estate.NamaEstate, tx.Afdeling.NamaAfdeling)
+		}
+		return tx.Afdeling.NamaAfdeling
+	}
+
+	if tx.Estate != nil && tx.Estate.NamaEstate != "" {
+		return tx.Estate.NamaEstate
+	}
+
+	if tx.SumberTBS != "" {
+		return tx.SumberTBS
+	}
+
+	return "-"
 }
 
 // ============================================================================
@@ -611,7 +663,7 @@ func (s *PKSReportService) ExportToCSV(data *ReportData) (string, error) {
 
 	// Detail transactions
 	builder.WriteString("=== DETAIL TRANSAKSI ===\n")
-	builder.WriteString("No Transaksi,Tanggal,Nomor Kendaraan,Supplier,Tipe TBS,Produk,Grade,Bruto,Bruto2,Netto,Netto2,Status,Petugas 1,Petugas 2\n")
+	builder.WriteString("No Transaksi,Tanggal,Nomor Kendaraan,Supplier,Tipe TBS,Sumber TBS,Produk,Grade,Bruto,Bruto2,Netto,Netto2,Status,Petugas 1,Petugas 2\n")
 
 	for _, tx := range data.Transactions {
 		timbang1 := tx.Timbang1Date.Format("02/01/2006 15:04")
@@ -628,12 +680,13 @@ func (s *PKSReportService) ExportToCSV(data *ReportData) (string, error) {
 			status = "AFKIR"
 		}
 
-		builder.WriteString(fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%.2f,%s,%s,%s,%s\n",
+		builder.WriteString(fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s,%s,%.2f,%s,%.2f,%s,%s,%s,%s\n",
 			tx.NoTransaksi,
 			timbang1,
 			tx.NomorKendaraan,
 			tx.SupplierName,
 			tx.SupplierType,
+			tx.SourceSummary,
 			tx.ProductName,
 			tx.Grade,
 			tx.Bruto,
@@ -692,8 +745,8 @@ func (s *PKSReportService) GenerateOperationalConclusions(ctx context.Context, d
 	// Quality summary
 	passRate := 100.0 - data.Summary.TotalRejections.Percentage
 	conclusions.QualitySummary = QualitySummary{
-		PassRate:      passRate,
-		RejectionRate: data.Summary.TotalRejections.Percentage,
+		PassRate:       passRate,
+		RejectionRate:  data.Summary.TotalRejections.Percentage,
 		GradeBreakdown: make(map[string]int),
 	}
 
@@ -787,11 +840,11 @@ func (s *PKSReportService) GetFilterOptions(ctx context.Context) (*ReportFilterO
 		"all", "timbang1", "timbang2", "selesai", "batal",
 	}
 	statusLabels := map[string]string{
-		"all":       "Semua Status",
-		"timbang1":  "Timbang 1",
-		"timbang2":  "Timbang 2",
-		"selesai":   "Selesai",
-		"batal":     "Batal",
+		"all":      "Semua Status",
+		"timbang1": "Timbang 1",
+		"timbang2": "Timbang 2",
+		"selesai":  "Selesai",
+		"batal":    "Batal",
 	}
 
 	for _, status := range statusOptions {

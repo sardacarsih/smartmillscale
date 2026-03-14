@@ -655,6 +655,11 @@ func (s *PKSMasterService) DeleteEstate(ctx context.Context, id uint) error {
 	if err := s.db.WithContext(ctx).Model(&database.TimbanganPKS{}).Where("id_estate = ?", id).Count(&count).Error; err != nil {
 		return fmt.Errorf("failed to check estate usage in transactions: %w", err)
 	}
+	if count == 0 {
+		if err := s.db.WithContext(ctx).Model(&database.TimbanganPKSTBSBlockDetail{}).Where("id_estate = ?", id).Count(&count).Error; err != nil {
+			return fmt.Errorf("failed to check estate usage in block details: %w", err)
+		}
+	}
 	if count > 0 {
 		return fmt.Errorf("Estate tidak dapat dihapus karena sudah digunakan di %d transaksi penimbangan", count)
 	}
@@ -871,6 +876,11 @@ func (s *PKSMasterService) DeleteAfdeling(ctx context.Context, id uint) error {
 	if err := s.db.WithContext(ctx).Model(&database.TimbanganPKS{}).Where("id_afdeling = ?", id).Count(&count).Error; err != nil {
 		return fmt.Errorf("failed to check afdeling usage in transactions: %w", err)
 	}
+	if count == 0 {
+		if err := s.db.WithContext(ctx).Model(&database.TimbanganPKSTBSBlockDetail{}).Where("id_afdeling = ?", id).Count(&count).Error; err != nil {
+			return fmt.Errorf("failed to check afdeling usage in block details: %w", err)
+		}
+	}
 	if count > 0 {
 		return fmt.Errorf("Afdeling tidak dapat dihapus karena sudah digunakan di %d transaksi penimbangan", count)
 	}
@@ -1082,6 +1092,11 @@ func (s *PKSMasterService) DeleteBlok(ctx context.Context, id uint) error {
 	var count int64
 	if err := s.db.WithContext(ctx).Model(&database.TimbanganPKS{}).Where("id_blok = ?", id).Count(&count).Error; err != nil {
 		return fmt.Errorf("failed to check block usage: %w", err)
+	}
+	if count == 0 {
+		if err := s.db.WithContext(ctx).Model(&database.TimbanganPKSTBSBlockDetail{}).Where("id_blok = ?", id).Count(&count).Error; err != nil {
+			return fmt.Errorf("failed to check block usage in block details: %w", err)
+		}
 	}
 	if count > 0 {
 		return fmt.Errorf("Blok tidak dapat dihapus karena sudah digunakan di %d transaksi penimbangan", count)

@@ -212,6 +212,7 @@ func (app *Application) runMigrations(db *gorm.DB) error {
 		&database.MasterAfdeling{},
 		&database.MasterBlok{},
 		&database.TimbanganPKS{},
+		&database.TimbanganPKSTBSBlockDetail{},
 		&database.PKSTicket{},
 	}
 

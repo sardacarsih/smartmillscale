@@ -23,15 +23,26 @@ export class PKSService {
      * @returns {Promise<Object>} Created transaction object
      */
     async createTimbang1(data, userId) {
+        const tbsBlockDetails = Array.isArray(data.tbsBlocks)
+            ? data.tbsBlocks
+                .filter(item => item?.idBlok)
+                .map(item => ({
+                    idBlok: parseInt(item.idBlok, 10),
+                    janjang: Number.isFinite(Number(item.janjang)) ? parseInt(item.janjang, 10) : 0,
+                    brondolanKg: Number.isFinite(Number(item.brondolanKg)) ? parseFloat(item.brondolanKg) : 0,
+                }))
+            : []
+
         // Convert string fields to numbers for backend
         const requestData = {
             ...data,
             idProduk: data.idProduk ? parseInt(data.idProduk) : 0,
             idUnit: data.idUnit ? parseInt(data.idUnit) : 0,
-            idSupplier: data.idSupplier ? parseInt(data.idSupplier) : 0,
+            idSupplier: data.idSupplier ? parseInt(data.idSupplier) : null,
             idEstate: data.idEstate ? parseInt(data.idEstate) : null,
             idAfdeling: data.idAfdeling ? parseInt(data.idAfdeling) : null,
             idBlok: data.idBlok ? parseInt(data.idBlok) : null,
+            tbsBlockDetails,
         }
 
         const result = await this.wails.CreateTimbang1(JSON.stringify(requestData), userId)
