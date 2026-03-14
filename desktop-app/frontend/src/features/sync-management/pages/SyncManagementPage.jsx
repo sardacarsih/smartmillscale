@@ -18,6 +18,7 @@ import {
 
 import APIKeyManagementPage from './APIKeyManagementPage'
 import userManagementTheme from '../../user-management/theme'
+import { PageShell } from '../../../shared'
 
 const SyncManagementPage = ({ currentUser, wails: wailsProp, onNavigate, onLogout }) => {
   const [activeTab, setActiveTab] = useState(0)
@@ -107,9 +108,17 @@ const SyncManagementPage = ({ currentUser, wails: wailsProp, onNavigate, onLogou
 
   return (
     <ThemeProvider theme={userManagementTheme}>
-      <Box sx={{ minHeight: '100vh', bgcolor: '#111827' }}>
-        {/* Header */}
-        <Container maxWidth="xl" sx={{ py: 3 }}>
+      <PageShell
+        title="Smart Mill Scale"
+        subtitle="Manajemen Sinkronisasi"
+        currentUser={currentUser}
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        pageTitle="Kelola Sinkronisasi"
+        pageDescription="Konfigurasi sinkronisasi dan API key dengan navigasi tab yang tetap stabil pada berbagai resolusi desktop."
+        contentWidth="full"
+      >
+        <Container maxWidth={false} disableGutters sx={{ py: 0 }}>
           <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
             <SyncIcon sx={{ fontSize: 32, color: 'primary.main' }} />
             <Box>
@@ -123,7 +132,7 @@ const SyncManagementPage = ({ currentUser, wails: wailsProp, onNavigate, onLogou
           </Box>
 
           {/* Tab Navigation */}
-          <Paper sx={{ mb: 3 }}>
+          <Paper sx={{ mb: 3, overflow: 'hidden' }}>
             <Tabs
               value={activeTab}
               onChange={handleTabChange}
@@ -159,7 +168,7 @@ const SyncManagementPage = ({ currentUser, wails: wailsProp, onNavigate, onLogou
           {/* Tab Content */}
           {renderTabContent()}
         </Container>
-      </Box>
+      </PageShell>
     </ThemeProvider>
   )
 }

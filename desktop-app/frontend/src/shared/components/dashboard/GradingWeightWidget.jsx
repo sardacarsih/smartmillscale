@@ -1,4 +1,3 @@
-import React from 'react'
 import useGlobalWeightStore from '../../store/useGlobalWeightStore'
 import { useWeightHistory } from '../../hooks'
 import { formatWeight } from '../../utils/formatters'
@@ -18,9 +17,7 @@ const GradingWeightWidget = ({ wails, className = '' }) => {
     currentWeight,
     isStable,
     isConnected,
-    isMonitoring,
     lastUpdate,
-    unit
   } = useGlobalWeightStore()
 
   // Derived state
@@ -89,7 +86,7 @@ const GradingWeightWidget = ({ wails, className = '' }) => {
       {hasHistoryAccess && statistics && statistics.total > 0 && (
         <div className="mb-4 bg-gray-750 rounded-lg p-4">
           <p className="text-xs text-gray-400 mb-3">Statistik Hari Ini</p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="text-center">
               <p className="text-xs text-gray-500 mb-1">Total</p>
               <p className="text-lg font-bold text-white">{statistics.total}</p>

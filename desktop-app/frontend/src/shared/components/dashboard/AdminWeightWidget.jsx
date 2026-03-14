@@ -1,7 +1,5 @@
-import React from 'react'
 import useGlobalWeightStore from '../../store/useGlobalWeightStore'
 import { WeightDisplay, ConnectionStatus } from '../weight'
-import { formatWeight } from '../../utils/formatters'
 
 /**
  * AdminWeightWidget
@@ -20,14 +18,12 @@ const AdminWeightWidget = ({ wails, className = '' }) => {
     isStable,
     isMonitoring,
     error,
-    lastUpdate,
-    unit
+    lastUpdate
   } = useGlobalWeightStore()
 
   // Derived state
   const hasAccess = true // Always show for admin dashboard
-  const formattedWeight = formatWeight(currentWeight)
-  const statusColor = isConnected ? (isStable ? 'green' : 'yellow') : 'red'
+  const statusTextClass = isConnected ? (isStable ? 'text-green-400' : 'text-yellow-400') : 'text-red-400'
   const statistics = {} // TODO: Implement statistics
   const hasAnalyticsAccess = true
   const trend = null
@@ -41,7 +37,7 @@ const AdminWeightWidget = ({ wails, className = '' }) => {
   return (
     <div className={`bg-gray-800 rounded-lg border border-gray-700 p-6 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2">
           <span className="text-2xl">⚖️</span>
           Weight Monitoring System
@@ -181,10 +177,21 @@ const AdminWeightWidget = ({ wails, className = '' }) => {
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-400">Status</span>
-                  <span className={`font-medium ${statusColor}`}>
+                  <span className={`font-medium ${statusTextClass}`}>
                     {isConnected ? 'Connected' : 'Disconnected'}
                   </span>
                 </div>
+                {lastUpdate && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400">Last Update</span>
+                    <span className="font-medium text-white">
+                      {new Date(lastUpdate).toLocaleTimeString('id-ID', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -1,11 +1,8 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { create } from 'zustand'
 
-// Mock the Wails API
 const mockLoginFunc = vi.fn()
 const mockLogoutFunc = vi.fn()
 const mockCheckSessionFunc = vi.fn()
-const mockRefreshSessionFunc = vi.fn()
 const mockCheckSetupFunc = vi.fn()
 
 // Import the store
@@ -16,10 +13,23 @@ const originalConsoleError = console.error
 const originalConsoleLog = console.log
 
 describe('useAuthStore', () => {
+  const createUserService = (overrides = {}) => ({
+    login: mockLoginFunc,
+    logout: mockLogoutFunc,
+    getCurrentUser: mockCheckSessionFunc,
+    wails: {
+      GetCurrentUser: vi.fn()
+    },
+    ...overrides
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     console.error = vi.fn()
     console.log = vi.fn()
+    useAuthStore.getState().forceLogout()
+    useAuthStore.getState().clearError()
+    useAuthStore.getState().setLoading(false)
   })
 
   afterEach(() => {
@@ -84,7 +94,7 @@ describe('useAuthStore', () => {
       mockLoginFunc.mockResolvedValue(mockResponse)
 
       // Attempt login
-      const result = await store.login(mockLoginFunc, 'admin', 'admin123')
+      const result = await store.login(createUserService(), 'admin', 'admin123')
 
       // Get fresh state after login
       const freshState = useAuthStore.getState()
@@ -99,9 +109,8 @@ describe('useAuthStore', () => {
       expect(freshState.lastActivity).toBeDefined()
     })
 
-    it('harus menangani respons JSON string dari backend', async () => {
-      // Mock backend returning JSON string
-      const mockResponseString = JSON.stringify({
+    it('harus menerima data login yang sudah diparse oleh UserService', async () => {
+      const mockResponse = {
         success: true,
         message: 'Login successful',
         data: {
@@ -117,12 +126,12 @@ describe('useAuthStore', () => {
             device_id: 'device-001'
           }
         }
-      })
+      }
 
-      mockLoginFunc.mockResolvedValue(mockResponseString)
+      mockLoginFunc.mockResolvedValue(mockResponse)
 
       // Attempt login
-      const result = await store.login(mockLoginFunc, 'admin', 'admin123')
+      const result = await store.login(createUserService(), 'admin', 'admin123')
 
       // Get fresh state after login
       const freshState = useAuthStore.getState()
@@ -162,7 +171,7 @@ describe('useAuthStore', () => {
       mockLoginFunc.mockResolvedValue(mockResponseObject)
 
       // Attempt login
-      const result = await store.login(mockLoginFunc, 'admin', 'admin123')
+      const result = await store.login(createUserService(), 'admin', 'admin123')
 
       // Get fresh state after login
       const freshState = useAuthStore.getState()
@@ -194,7 +203,7 @@ describe('useAuthStore', () => {
       mockLoginFunc.mockResolvedValue(mockErrorResponse)
 
       // Attempt login and expect error
-      await expect(store.login(mockLoginFunc, 'admin', 'wrongpassword')).rejects.toThrow('Invalid password. Please check your password and try again.')
+      await expect(store.login(createUserService(), 'admin', 'wrongpassword')).rejects.toThrow('Invalid password. Please check your password and try again.')
 
       // Get fresh state after failed login
       const freshState = useAuthStore.getState()
@@ -223,7 +232,7 @@ describe('useAuthStore', () => {
       mockLoginFunc.mockResolvedValue(mockErrorResponse)
 
       // Attempt login and expect error
-      await expect(store.login(mockLoginFunc, 'nonexistent', 'password')).rejects.toThrow('Username not found. Please check your username and try again.')
+      await expect(store.login(createUserService(), 'nonexistent', 'password')).rejects.toThrow('Username not found. Please check your username and try again.')
 
       // Get fresh state after failed login
       const freshState = useAuthStore.getState()
@@ -248,7 +257,7 @@ describe('useAuthStore', () => {
       mockLoginFunc.mockResolvedValue(mockErrorResponse)
 
       // Attempt login and expect error
-      await expect(store.login(mockLoginFunc, 'inactive', 'password')).rejects.toThrow('Your account has been deactivated. Please contact your administrator.')
+      await expect(store.login(createUserService(), 'inactive', 'password')).rejects.toThrow('Your account has been deactivated. Please contact your administrator.')
     })
 
     it('harus menangani format respons tidak valid', async () => {
@@ -256,20 +265,20 @@ describe('useAuthStore', () => {
       mockLoginFunc.mockRejectedValue(new Error('Invalid response format from server'))
 
       // Attempt login and expect error
-      await expect(store.login(mockLoginFunc, 'admin', 'admin123')).rejects.toThrow('Invalid response format from server')
+      await expect(store.login(createUserService(), 'admin', 'admin123')).rejects.toThrow('Invalid response format from server')
     })
 
     it('harus menangani koneksi database tidak tersedia', async () => {
       // Mock no login function available
-      await expect(store.login(null, 'admin', 'admin123')).rejects.toThrow('Database connection not available')
+      await expect(store.login(null, 'admin', 'admin123')).rejects.toThrow('UserService not available')
     })
 
     it('harus menangani error parsing JSON', async () => {
-      // Mock invalid JSON string
+      // Invalid strings are treated as failed service responses at the store layer
       mockLoginFunc.mockResolvedValue('invalid json string')
 
       // Attempt login and expect error
-      await expect(store.login(mockLoginFunc, 'admin', 'admin123')).rejects.toThrow('Invalid response format from server')
+      await expect(store.login(createUserService(), 'admin', 'admin123')).rejects.toThrow('Login failed')
     })
   })
 
@@ -288,7 +297,7 @@ describe('useAuthStore', () => {
     it('harus berhasil logout', async () => {
       mockLogoutFunc.mockResolvedValue(undefined)
 
-      await store.logout(mockLogoutFunc)
+      await store.logout(createUserService())
 
       // Get fresh state after logout
       const freshState = useAuthStore.getState()
@@ -304,12 +313,13 @@ describe('useAuthStore', () => {
     it('harus menangani error logout dengan baik', async () => {
       mockLogoutFunc.mockRejectedValue(new Error('Logout failed'))
 
-      await store.logout(mockLogoutFunc)
+      await store.logout(createUserService())
 
       // Should still clear local state even if logout fails
-      expect(store.isAuthenticated).toBe(false)
-      expect(store.user).toBeNull()
-      expect(store.session).toBeNull()
+      const freshState = useAuthStore.getState()
+      expect(freshState.isAuthenticated).toBe(false)
+      expect(freshState.user).toBeNull()
+      expect(freshState.session).toBeNull()
     })
   })
 
@@ -341,12 +351,12 @@ describe('useAuthStore', () => {
 
       mockCheckSessionFunc.mockResolvedValue(mockSessionResponse)
 
-      const result = await store.checkSession(mockCheckSessionFunc)
+      const result = await store.checkSession(createUserService())
 
       // Get fresh state after session check
       const freshState = useAuthStore.getState()
 
-      expect(result).toBeTruthy()
+      expect(result).toEqual(mockSessionResponse.data)
       expect(freshState.isAuthenticated).toBe(true)
       expect(freshState.user).toEqual(mockSessionResponse.data.user)
       expect(freshState.session).toEqual(mockSessionResponse.data.session)
@@ -365,19 +375,20 @@ describe('useAuthStore', () => {
 
       mockCheckSessionFunc.mockResolvedValue(mockErrorResponse)
 
-      const result = await store.checkSession(mockCheckSessionFunc)
+      const result = await store.checkSession(createUserService())
 
       expect(result).toBeNull()
-      expect(store.isAuthenticated).toBe(false)
-      expect(store.user).toBeNull()
-      expect(store.session).toBeNull()
+      const freshState = useAuthStore.getState()
+      expect(freshState.isAuthenticated).toBe(false)
+      expect(freshState.user).toBeNull()
+      expect(freshState.session).toBeNull()
     })
 
     it('harus menangani koneksi database tidak tersedia', async () => {
       const result = await store.checkSession(null)
 
       expect(result).toBeNull()
-      expect(store.isAuthenticated).toBe(false)
+      expect(useAuthStore.getState().isAuthenticated).toBe(false)
     })
   })
 
@@ -468,11 +479,12 @@ describe('useAuthStore', () => {
 
       store.forceLogout()
 
-      expect(store.isAuthenticated).toBe(false)
-      expect(store.user).toBeNull()
-      expect(store.session).toBeNull()
-      expect(store.error).toBeNull()
-      expect(store.isLoading).toBe(false)
+      const freshState = useAuthStore.getState()
+      expect(freshState.isAuthenticated).toBe(false)
+      expect(freshState.user).toBeNull()
+      expect(freshState.session).toBeNull()
+      expect(freshState.error).toBeNull()
+      expect(freshState.isLoading).toBe(false)
     })
   })
 

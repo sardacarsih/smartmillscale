@@ -53,18 +53,24 @@ const AfdelingTab = ({ syncRefreshToken = 0 }) => {
     { key: 'estate.nama_estate', title: 'Estate', width: '180', sortable: true, render: (value, row) => row.estate?.nama_estate || '-' },
     { key: 'luas', title: 'Luas (Ha)', width: '120', sortable: true, render: (value) => value ? `${parseFloat(value).toLocaleString()}` : '-' },
     {
-    {
-      key: 'data_source', title: 'Sumber', width: '110', sortable: true,
+      key: 'data_source',
+      title: 'Sumber',
+      width: '110',
+      sortable: true,
       render: (value) => {
         const source = String(value || 'MANUAL').toUpperCase();
         const isServer = source === 'SERVER';
         return (
-          <span className={inline-flex px-2 py-1 text-xs font-semibold rounded-full }>
+          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${isServer
+            ? 'bg-blue-100 text-blue-800'
+            : 'bg-amber-100 text-amber-800'
+            }`}>
             {source}
           </span>
         );
       }
     },
+    {
       key: 'is_active', title: 'Status', width: '100', sortable: true,
       render: (value) => (
         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>

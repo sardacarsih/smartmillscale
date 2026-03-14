@@ -10,11 +10,13 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
 
-    // Target modern browsers for smaller bundle
-    target: 'es2020',
+    // Wails targets a modern desktop WebView, so esnext avoids the esbuild
+    // transpile stage that is failing under this Windows environment.
+    target: 'esnext',
 
-    // Minification (esbuild default in Vite 8)
-    minify: 'esbuild',
+    // Keep build output on the native/rolldown path. This trades bundle size
+    // for build reliability in the current environment.
+    minify: false,
 
     // Code splitting
     rollupOptions: {

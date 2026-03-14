@@ -40,7 +40,6 @@ import CreateAPIKeyDialog from '../components/CreateAPIKeyDialog'
 import EditAPIKeyDialog from '../components/EditAPIKeyDialog'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import userManagementTheme from '../../user-management/theme'
-import { Topbar } from '../../../shared'
 import { getWailsWrapper } from '../../../shared/lib/wailsWrapper'
 
 const APIKeyManagementPage = ({ currentUser, wails: wailsProp, onNavigate, onLogout }) => {
@@ -295,18 +294,10 @@ const APIKeyManagementPage = ({ currentUser, wails: wailsProp, onNavigate, onLog
 
   return (
     <ThemeProvider theme={userManagementTheme}>
-      <Box sx={{ minHeight: '100vh', bgcolor: '#111827' }}>
-        {/* Topbar */}
-        <Topbar
-          currentUser={currentUser}
-          onNavigate={onNavigate}
-          onLogout={onLogout}
-        />
-
-        {/* Main Content */}
-        <Container maxWidth="xl" sx={{ py: 3 }}>
+      <Box sx={{ bgcolor: '#111827' }}>
+        <Container maxWidth={false} disableGutters sx={{ py: 0 }}>
           {/* Header */}
-          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <KeyIcon sx={{ fontSize: 32, color: 'primary.main' }} />
               <Box>
@@ -417,7 +408,7 @@ const APIKeyManagementPage = ({ currentUser, wails: wailsProp, onNavigate, onLog
           </Card>
 
           {/* API Keys Table */}
-          <Card>
+          <Card sx={{ overflowX: 'auto' }}>
             <CardContent sx={{ p: 0 }}>
               <APIKeyTable
                 apiKeys={filteredAPIKeys}

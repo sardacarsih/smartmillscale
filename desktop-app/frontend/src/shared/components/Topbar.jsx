@@ -9,17 +9,17 @@ const Topbar = ({
   onNavigate
 }) => {
   return (
-    <header className="bg-gray-800/90 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold text-white">{title}</h1>
+    <header className="sticky top-0 z-40 border-b border-gray-800 bg-gray-950/90 backdrop-blur-md">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex min-h-16 flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-bold text-white sm:text-xl">{title}</h1>
             {subtitle && (
-              <span className="text-gray-400 text-sm">{subtitle}</span>
+              <p className="mt-1 text-sm text-gray-400">{subtitle}</p>
             )}
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex justify-end">
             <UserBadge
               user={currentUser}
               onLogout={onLogout}

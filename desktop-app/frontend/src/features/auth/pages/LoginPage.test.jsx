@@ -1,377 +1,387 @@
+import React from 'react'
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
 import LoginPage from './LoginPage'
 import useAuthStore from '../store/useAuthStore'
 import { useNotificationStore } from '../../../shared'
 
-// Mock the stores
+const h = React.createElement
+
 vi.mock('../store/useAuthStore')
 vi.mock('../../../shared', () => ({
-    useNotificationStore: vi.fn()
+  useNotificationStore: vi.fn()
 }))
-
-// Mock lucide-react icons
 vi.mock('lucide-react', () => ({
-    Eye: () => <div>Eye Icon</div>,
-    EyeOff: () => <div>EyeOff Icon</div>,
-    AlertCircle: () => <div>Alert Icon</div>,
-    Lock: () => <div>Lock Icon</div>,
-    User: () => <div>User Icon</div>
+  Eye: () => h('div', null, 'Eye Icon'),
+  EyeOff: () => h('div', null, 'EyeOff Icon'),
+  AlertCircle: () => h('div', null, 'Alert Icon'),
+  Lock: () => h('div', null, 'Lock Icon'),
+  User: () => h('div', null, 'User Icon')
 }))
 
 describe('LoginPage', () => {
-    let mockLogin
-    let mockClearError
-    let mockShowSuccess
-    let mockClearNotification
-    let mockWails
+  let mockLogin
+  let mockClearError
+  let mockShowSuccess
+  let mockClearNotification
+  let mockWails
+  let authStoreState
 
-    beforeEach(() => {
-        // Setup mocks
-        mockLogin = vi.fn()
-        mockClearError = vi.fn()
-        mockShowSuccess = vi.fn()
-        mockClearNotification = vi.fn()
+  const setAuthStoreMock = (overrides = {}) => {
+    authStoreState = {
+      login: mockLogin,
+      isLoading: false,
+      error: null,
+      clearError: mockClearError,
+      ...overrides
+    }
 
-        // Mock Wails object with Login method
-        mockWails = {
-            Login: vi.fn()
+    useAuthStore.mockReturnValue(authStoreState)
+    useAuthStore.getState = vi.fn(() => ({
+      isAuthenticated: false,
+      user: null,
+      error: authStoreState.error,
+      ...overrides.getState,
+    }))
+  }
+
+  beforeEach(() => {
+    mockLogin = vi.fn()
+    mockClearError = vi.fn()
+    mockShowSuccess = vi.fn()
+    mockClearNotification = vi.fn()
+    mockWails = {
+      Login: vi.fn()
+    }
+
+    setAuthStoreMock()
+
+    useNotificationStore.mockReturnValue({
+      notification: null,
+      clearNotification: mockClearNotification,
+      showSuccess: mockShowSuccess
+    })
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('Rendering Komponen', () => {
+    it('harus render form login dengan semua elemen', () => {
+      render(h(LoginPage, { wails: mockWails }))
+
+      expect(screen.getByText('Smart Mill Scale')).toBeInTheDocument()
+      expect(screen.getByText('Masuk ke sistem penimbangan')).toBeInTheDocument()
+      expect(screen.getByLabelText('Username')).toBeInTheDocument()
+      expect(screen.getByLabelText('Password')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /masuk/i })).toBeInTheDocument()
+    })
+
+    it('harus menampilkan placeholder yang benar', () => {
+      render(h(LoginPage, { wails: mockWails }))
+
+      expect(screen.getByPlaceholderText('Masukkan username')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Masukkan password')).toBeInTheDocument()
+    })
+
+    it('harus render informasi footer', () => {
+      render(h(LoginPage, { wails: mockWails }))
+
+      expect(screen.getByText('Hubungi administrator untuk mendapatkan akses')).toBeInTheDocument()
+      expect(screen.getByText('Smart Mill Scale v1.0.0')).toBeInTheDocument()
+    })
+  })
+
+  describe('Input Handling', () => {
+    it('harus mengupdate nilai username saat user mengetik', async () => {
+      const user = userEvent.setup()
+      render(h(LoginPage, { wails: mockWails }))
+
+      const usernameInput = screen.getByLabelText('Username')
+      await user.type(usernameInput, 'admin')
+
+      expect(usernameInput).toHaveValue('admin')
+    })
+
+    it('harus mengupdate nilai password saat user mengetik', async () => {
+      const user = userEvent.setup()
+      render(h(LoginPage, { wails: mockWails }))
+
+      const passwordInput = screen.getByLabelText('Password')
+      await user.type(passwordInput, 'password123')
+
+      expect(passwordInput).toHaveValue('password123')
+    })
+
+    it('harus clear error saat user mulai mengetik', async () => {
+      const user = userEvent.setup()
+      setAuthStoreMock({
+        error: 'Login failed'
+      })
+
+      render(h(LoginPage, { wails: mockWails }))
+
+      const usernameInput = screen.getByLabelText('Username')
+      await user.type(usernameInput, 'a')
+
+      expect(mockClearError).toHaveBeenCalled()
+    })
+  })
+
+  describe('Password Visibility Toggle', () => {
+    it('harus menampilkan password sebagai hidden by default', () => {
+      render(h(LoginPage, { wails: mockWails }))
+
+      const passwordInput = screen.getByLabelText('Password')
+      expect(passwordInput).toHaveAttribute('type', 'password')
+    })
+
+    it('harus toggle password visibility saat tombol diklik', async () => {
+      const user = userEvent.setup()
+      render(h(LoginPage, { wails: mockWails }))
+
+      const passwordInput = screen.getByLabelText('Password')
+      const toggleButton = passwordInput.parentElement.querySelector('button')
+
+      expect(passwordInput).toHaveAttribute('type', 'password')
+
+      await user.click(toggleButton)
+      expect(passwordInput).toHaveAttribute('type', 'text')
+
+      await user.click(toggleButton)
+      expect(passwordInput).toHaveAttribute('type', 'password')
+    })
+  })
+
+  describe('Form Validation', () => {
+    it('harus disable submit button jika username kosong', () => {
+      render(h(LoginPage, { wails: mockWails }))
+
+      const submitButton = screen.getByRole('button', { name: /masuk/i })
+      expect(submitButton).toBeDisabled()
+    })
+
+    it('harus disable submit button jika password kosong', async () => {
+      const user = userEvent.setup()
+      render(h(LoginPage, { wails: mockWails }))
+
+      const usernameInput = screen.getByLabelText('Username')
+      await user.type(usernameInput, 'admin')
+
+      const submitButton = screen.getByRole('button', { name: /masuk/i })
+      expect(submitButton).toBeDisabled()
+    })
+
+    it('harus enable submit button jika kedua field terisi', async () => {
+      const user = userEvent.setup()
+      render(h(LoginPage, { wails: mockWails }))
+
+      const usernameInput = screen.getByLabelText('Username')
+      const passwordInput = screen.getByLabelText('Password')
+
+      await user.type(usernameInput, 'admin')
+      await user.type(passwordInput, 'password123')
+
+      const submitButton = screen.getByRole('button', { name: /masuk/i })
+      expect(submitButton).not.toBeDisabled()
+    })
+
+    it('harus disable submit button jika username hanya spasi', async () => {
+      const user = userEvent.setup()
+      render(h(LoginPage, { wails: mockWails }))
+
+      const usernameInput = screen.getByLabelText('Username')
+      const passwordInput = screen.getByLabelText('Password')
+
+      await user.type(usernameInput, '   ')
+      await user.type(passwordInput, 'password123')
+
+      const submitButton = screen.getByRole('button', { name: /masuk/i })
+      expect(submitButton).toBeDisabled()
+    })
+  })
+
+  describe('Login Submission', () => {
+    it('harus memanggil login function dengan kredensial yang benar', async () => {
+      const user = userEvent.setup()
+      mockLogin.mockResolvedValue(true)
+      setAuthStoreMock({
+        getState: {
+          isAuthenticated: true,
+          user: { username: 'admin' },
+          error: null
         }
+      })
 
-        // Mock useAuthStore
-        useAuthStore.mockReturnValue({
-            login: mockLogin,
-            isLoading: false,
-            error: null,
-            clearError: mockClearError
-        })
+      render(h(LoginPage, { wails: mockWails }))
 
-        // Mock useNotificationStore
-        useNotificationStore.mockReturnValue({
-            notification: null,
-            clearNotification: mockClearNotification,
-            showSuccess: mockShowSuccess
-        })
+      const usernameInput = screen.getByLabelText('Username')
+      const passwordInput = screen.getByLabelText('Password')
+      const submitButton = screen.getByRole('button', { name: /masuk/i })
+
+      await user.type(usernameInput, 'admin')
+      await user.type(passwordInput, 'password123')
+      await user.click(submitButton)
+
+      await waitFor(() => {
+        expect(mockLogin).toHaveBeenCalled()
+        const callArgs = mockLogin.mock.calls[0]
+        expect(callArgs[1]).toBe('admin')
+        expect(callArgs[2]).toBe('password123')
+        expect(callArgs[3]).toMatch(/^device-/)
+      })
     })
 
-    afterEach(() => {
-        vi.clearAllMocks()
+    it('harus menampilkan success notification setelah login berhasil', async () => {
+      const user = userEvent.setup()
+      mockLogin.mockResolvedValue(true)
+      setAuthStoreMock({
+        getState: {
+          isAuthenticated: true,
+          user: { username: 'admin' },
+          error: null
+        }
+      })
+
+      render(h(LoginPage, { wails: mockWails }))
+
+      const usernameInput = screen.getByLabelText('Username')
+      const passwordInput = screen.getByLabelText('Password')
+      const submitButton = screen.getByRole('button', { name: /masuk/i })
+
+      await user.type(usernameInput, 'admin')
+      await user.type(passwordInput, 'password123')
+      await user.click(submitButton)
+
+      await waitFor(() => {
+        expect(mockShowSuccess).toHaveBeenCalledWith('Selamat datang kembali, admin!')
+      })
     })
 
-    describe('Rendering Komponen', () => {
-        it('harus render form login dengan semua elemen', () => {
-            const mockWails = {
-                Login: vi.fn()
-            }
-            render(<LoginPage wails={mockWails} />)
+    it('harus memanggil onLoginSuccess callback jika disediakan', async () => {
+      const user = userEvent.setup()
+      const mockOnLoginSuccess = vi.fn()
+      mockLogin.mockResolvedValue(true)
+      setAuthStoreMock({
+        getState: {
+          isAuthenticated: true,
+          user: { username: 'admin' },
+          error: null
+        }
+      })
 
-            // Check title
-            expect(screen.getByText('Smart Mill Scale')).toBeInTheDocument()
-            expect(screen.getByText('Masuk ke sistem penimbangan')).toBeInTheDocument()
+      render(h(LoginPage, { wails: mockWails, onLoginSuccess: mockOnLoginSuccess }))
 
-            // Check form fields
-            expect(screen.getByLabelText('Username')).toBeInTheDocument()
-            expect(screen.getByLabelText('Password')).toBeInTheDocument()
+      const usernameInput = screen.getByLabelText('Username')
+      const passwordInput = screen.getByLabelText('Password')
+      const submitButton = screen.getByRole('button', { name: /masuk/i })
 
-            // Check submit button
-            expect(screen.getByRole('button', { name: /masuk/i })).toBeInTheDocument()
-        })
+      await user.type(usernameInput, 'admin')
+      await user.type(passwordInput, 'password123')
+      await user.click(submitButton)
 
-        it('harus menampilkan placeholder yang benar', () => {
-            render(<LoginPage wails={mockWails} />)
-
-            expect(screen.getByPlaceholderText('Masukkan username')).toBeInTheDocument()
-            expect(screen.getByPlaceholderText('Masukkan password')).toBeInTheDocument()
-        })
-
-        it('harus render informasi footer', () => {
-            render(<LoginPage wails={mockWails} />)
-
-            expect(screen.getByText('Hubungi administrator untuk mendapatkan akses')).toBeInTheDocument()
-            expect(screen.getByText('Smart Mill Scale v1.0.0')).toBeInTheDocument()
-        })
+      await waitFor(() => {
+        expect(mockOnLoginSuccess).toHaveBeenCalled()
+      })
     })
 
-    describe('Input Handling', () => {
-        it('harus mengupdate nilai username saat user mengetik', async () => {
-            const user = userEvent.setup()
-            render(<LoginPage wails={mockWails} />)
+    it('harus support Enter key untuk submit form', async () => {
+      const user = userEvent.setup()
+      mockLogin.mockResolvedValue(true)
+      setAuthStoreMock({
+        getState: {
+          isAuthenticated: true,
+          user: { username: 'admin' },
+          error: null
+        }
+      })
 
-            const usernameInput = screen.getByLabelText('Username')
-            await user.type(usernameInput, 'admin')
+      render(h(LoginPage, { wails: mockWails }))
 
-            expect(usernameInput).toHaveValue('admin')
-        })
+      const usernameInput = screen.getByLabelText('Username')
+      const passwordInput = screen.getByLabelText('Password')
 
-        it('harus mengupdate nilai password saat user mengetik', async () => {
-            const user = userEvent.setup()
-            render(<LoginPage wails={mockWails} />)
+      await user.type(usernameInput, 'admin')
+      await user.type(passwordInput, 'password123{Enter}')
 
-            const passwordInput = screen.getByLabelText('Password')
-            await user.type(passwordInput, 'password123')
+      await waitFor(() => {
+        expect(mockLogin).toHaveBeenCalled()
+      })
+    })
+  })
 
-            expect(passwordInput).toHaveValue('password123')
-        })
+  describe('Loading State', () => {
+    it('harus menampilkan loading state saat login sedang diproses', () => {
+      setAuthStoreMock({
+        isLoading: true
+      })
 
-        it('harus clear error saat user mulai mengetik', async () => {
-            const user = userEvent.setup()
-            useAuthStore.mockReturnValue({
-                login: mockLogin,
-                isLoading: false,
-                error: 'Login failed',
-                clearError: mockClearError
-            })
+      render(h(LoginPage, { wails: mockWails }))
 
-            render(<LoginPage wails={mockWails} />)
-
-            const usernameInput = screen.getByLabelText('Username')
-            await user.type(usernameInput, 'a')
-
-            expect(mockClearError).toHaveBeenCalled()
-        })
+      expect(screen.getByText('Masuk...')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /masuk/i })).toBeDisabled()
     })
 
-    describe('Password Visibility Toggle', () => {
-        it('harus menampilkan password sebagai hidden by default', () => {
-            render(<LoginPage wails={mockWails} />)
+    it('harus disable input fields saat loading', () => {
+      setAuthStoreMock({
+        isLoading: true
+      })
 
-            const passwordInput = screen.getByLabelText('Password')
-            expect(passwordInput).toHaveAttribute('type', 'password')
-        })
+      render(h(LoginPage, { wails: mockWails }))
 
-        it('harus toggle password visibility saat tombol diklik', async () => {
-            const user = userEvent.setup()
-            render(<LoginPage wails={mockWails} />)
+      expect(screen.getByLabelText('Username')).toBeDisabled()
+      expect(screen.getByLabelText('Password')).toBeDisabled()
+    })
+  })
 
-            const passwordInput = screen.getByLabelText('Password')
-            const toggleButton = passwordInput.parentElement.querySelector('button')
+  describe('Error Handling', () => {
+    it('harus menampilkan error message jika login gagal', () => {
+      setAuthStoreMock({
+        error: 'Username atau password salah'
+      })
 
-            // Initially hidden
-            expect(passwordInput).toHaveAttribute('type', 'password')
+      render(h(LoginPage, { wails: mockWails }))
 
-            // Click to show
-            await user.click(toggleButton)
-            expect(passwordInput).toHaveAttribute('type', 'text')
-
-            // Click to hide again
-            await user.click(toggleButton)
-            expect(passwordInput).toHaveAttribute('type', 'password')
-        })
+      expect(screen.getByText('Login Gagal')).toBeInTheDocument()
+      expect(screen.getByText('Username atau password salah')).toBeInTheDocument()
     })
 
-    describe('Form Validation', () => {
-        it('harus disable submit button jika username kosong', () => {
-            render(<LoginPage wails={mockWails} />)
+    it('harus menampilkan error untuk kredensial invalid', () => {
+      setAuthStoreMock({
+        error: 'Invalid password. Please check your password and try again.'
+      })
 
-            const submitButton = screen.getByRole('button', { name: /masuk/i })
-            expect(submitButton).toBeDisabled()
-        })
+      render(h(LoginPage, { wails: mockWails }))
 
-        it('harus disable submit button jika password kosong', async () => {
-            const user = userEvent.setup()
-            render(<LoginPage wails={mockWails} />)
+      expect(screen.getByText('Invalid password. Please check your password and try again.')).toBeInTheDocument()
+    })
+  })
 
-            const usernameInput = screen.getByLabelText('Username')
-            await user.type(usernameInput, 'admin')
+  describe('Success Notification', () => {
+    it('harus menampilkan success notification jika ada', () => {
+      useNotificationStore.mockReturnValue({
+        notification: {
+          type: 'success',
+          message: 'Login berhasil!'
+        },
+        clearNotification: mockClearNotification,
+        showSuccess: mockShowSuccess
+      })
 
-            const submitButton = screen.getByRole('button', { name: /masuk/i })
-            expect(submitButton).toBeDisabled()
-        })
+      render(h(LoginPage, { wails: mockWails }))
 
-        it('harus enable submit button jika kedua field terisi', async () => {
-            const user = userEvent.setup()
-            render(<LoginPage wails={mockWails} />)
-
-            const usernameInput = screen.getByLabelText('Username')
-            const passwordInput = screen.getByLabelText('Password')
-
-            await user.type(usernameInput, 'admin')
-            await user.type(passwordInput, 'password123')
-
-            const submitButton = screen.getByRole('button', { name: /masuk/i })
-            expect(submitButton).not.toBeDisabled()
-        })
-
-        it('harus disable submit button jika username hanya spasi', async () => {
-            const user = userEvent.setup()
-            render(<LoginPage wails={mockWails} />)
-
-            const usernameInput = screen.getByLabelText('Username')
-            const passwordInput = screen.getByLabelText('Password')
-
-            await user.type(usernameInput, '   ')
-            await user.type(passwordInput, 'password123')
-
-            const submitButton = screen.getByRole('button', { name: /masuk/i })
-            expect(submitButton).toBeDisabled()
-        })
+      expect(screen.getByText('Login berhasil!')).toBeInTheDocument()
     })
 
-    describe('Login Submission', () => {
-        it('harus memanggil login function dengan kredensial yang benar', async () => {
-            const user = userEvent.setup()
-            mockLogin.mockResolvedValue(true)
+    it('harus clear notification saat component unmount', () => {
+      const { unmount } = render(h(LoginPage, { wails: mockWails }))
 
-            render(<LoginPage wails={mockWails} />)
+      unmount()
 
-            const usernameInput = screen.getByLabelText('Username')
-            const passwordInput = screen.getByLabelText('Password')
-            const submitButton = screen.getByRole('button', { name: /masuk/i })
-
-            await user.type(usernameInput, 'admin')
-            await user.type(passwordInput, 'password123')
-            await user.click(submitButton)
-
-            await waitFor(() => {
-                expect(mockLogin).toHaveBeenCalled()
-                // Check that login was called with userService, username, password, and deviceID
-                const callArgs = mockLogin.mock.calls[0]
-                expect(callArgs[1]).toBe('admin') // username
-                expect(callArgs[2]).toBe('password123') // password
-                expect(callArgs[3]).toMatch(/^device-/) // deviceID pattern
-            })
-        })
-
-        it('harus menampilkan success notification setelah login berhasil', async () => {
-            const user = userEvent.setup()
-            mockLogin.mockResolvedValue(true)
-
-            render(<LoginPage wails={mockWails} />)
-
-            const usernameInput = screen.getByLabelText('Username')
-            const passwordInput = screen.getByLabelText('Password')
-            const submitButton = screen.getByRole('button', { name: /masuk/i })
-
-            await user.type(usernameInput, 'admin')
-            await user.type(passwordInput, 'password123')
-            await user.click(submitButton)
-
-            await waitFor(() => {
-                expect(mockShowSuccess).toHaveBeenCalledWith('Selamat datang kembali, admin!')
-            })
-        })
-
-        it('harus memanggil onLoginSuccess callback jika disediakan', async () => {
-            const user = userEvent.setup()
-            const mockOnLoginSuccess = vi.fn()
-            mockLogin.mockResolvedValue(true)
-
-            render(<LoginPage wails={mockWails} onLoginSuccess={mockOnLoginSuccess} />)
-
-            const usernameInput = screen.getByLabelText('Username')
-            const passwordInput = screen.getByLabelText('Password')
-            const submitButton = screen.getByRole('button', { name: /masuk/i })
-
-            await user.type(usernameInput, 'admin')
-            await user.type(passwordInput, 'password123')
-            await user.click(submitButton)
-
-            await waitFor(() => {
-                expect(mockOnLoginSuccess).toHaveBeenCalled()
-            })
-        })
-
-        it('harus support Enter key untuk submit form', async () => {
-            const user = userEvent.setup()
-            mockLogin.mockResolvedValue(true)
-
-            render(<LoginPage wails={mockWails} />)
-
-            const usernameInput = screen.getByLabelText('Username')
-            const passwordInput = screen.getByLabelText('Password')
-
-            await user.type(usernameInput, 'admin')
-            await user.type(passwordInput, 'password123{Enter}')
-
-            await waitFor(() => {
-                expect(mockLogin).toHaveBeenCalled()
-            })
-        })
+      expect(mockClearNotification).toHaveBeenCalled()
     })
-
-    describe('Loading State', () => {
-        it('harus menampilkan loading state saat login sedang diproses', () => {
-            useAuthStore.mockReturnValue({
-                login: mockLogin,
-                isLoading: true,
-                error: null,
-                clearError: mockClearError
-            })
-
-            render(<LoginPage wails={mockWails} />)
-
-            expect(screen.getByText('Masuk...')).toBeInTheDocument()
-            expect(screen.getByRole('button', { name: /masuk/i })).toBeDisabled()
-        })
-
-        it('harus disable input fields saat loading', () => {
-            useAuthStore.mockReturnValue({
-                login: mockLogin,
-                isLoading: true,
-                error: null,
-                clearError: mockClearError
-            })
-
-            render(<LoginPage wails={mockWails} />)
-
-            expect(screen.getByLabelText('Username')).toBeDisabled()
-            expect(screen.getByLabelText('Password')).toBeDisabled()
-        })
-    })
-
-    describe('Error Handling', () => {
-        it('harus menampilkan error message jika login gagal', () => {
-            useAuthStore.mockReturnValue({
-                login: mockLogin,
-                isLoading: false,
-                error: 'Username atau password salah',
-                clearError: mockClearError
-            })
-
-            render(<LoginPage wails={mockWails} />)
-
-            expect(screen.getByText('Login Gagal')).toBeInTheDocument()
-            expect(screen.getByText('Username atau password salah')).toBeInTheDocument()
-        })
-
-        it('harus menampilkan error untuk kredensial invalid', () => {
-            useAuthStore.mockReturnValue({
-                login: mockLogin,
-                isLoading: false,
-                error: 'Invalid password. Please check your password and try again.',
-                clearError: mockClearError
-            })
-
-            render(<LoginPage wails={mockWails} />)
-
-            expect(screen.getByText('Invalid password. Please check your password and try again.')).toBeInTheDocument()
-        })
-    })
-
-    describe('Success Notification', () => {
-        it('harus menampilkan success notification jika ada', () => {
-            useNotificationStore.mockReturnValue({
-                notification: {
-                    type: 'success',
-                    message: 'Login berhasil!'
-                },
-                clearNotification: mockClearNotification,
-                showSuccess: mockShowSuccess
-            })
-
-            render(<LoginPage wails={mockWails} />)
-
-            expect(screen.getByText('Login berhasil!')).toBeInTheDocument()
-        })
-
-        it('harus clear notification saat component unmount', () => {
-            const { unmount } = render(<LoginPage wails={mockWails} />)
-
-            unmount()
-
-            expect(mockClearNotification).toHaveBeenCalled()
-        })
-    })
+  })
 })
-

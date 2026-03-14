@@ -164,7 +164,7 @@ export const logError = (error, context = {}) => {
   }
 
   // Log to console in development
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console.error('User Management Error:', errorData)
   }
 

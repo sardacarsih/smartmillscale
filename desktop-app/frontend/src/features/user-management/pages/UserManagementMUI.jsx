@@ -37,7 +37,7 @@ import EditUserDialogMUI from '../components/EditUserDialogMUI'
 import UserProfileDialogMUI from '../components/UserProfileDialogMUI'
 import PasswordChangeDialogMUI from '../components/PasswordChangeDialogMUI'
 import ExportImportDialogMUI from '../components/ExportImportDialogMUI'
-import { Topbar } from '../../../shared'
+import { PageShell } from '../../../shared'
 import { getWailsWrapper } from '../../../shared/lib/wailsWrapper'
 
 const UserManagementMUI = ({ currentUser, wails: wailsProp, onNavigate, onLogout }) => {
@@ -190,21 +190,51 @@ const UserManagementMUI = ({ currentUser, wails: wailsProp, onNavigate, onLogout
     setSelectedUsers(newSelection)
   }
 
+  const pageActions = (
+    <>
+      <Button
+        variant="contained"
+        startIcon={<AddIcon />}
+        onClick={() => setShowCreateDialog(true)}
+      >
+        Buat User
+      </Button>
+      <Button
+        variant="outlined"
+        startIcon={<ExportIcon />}
+        onClick={() => setShowExportImportDialog(true)}
+      >
+        Export / Import
+      </Button>
+      {selectedUsers.length > 0 && (
+        <Button
+          variant="outlined"
+          color="error"
+          startIcon={<DeleteIcon />}
+          onClick={handleBulkDeleteClick}
+        >
+          Hapus ({selectedUsers.length})
+        </Button>
+      )}
+    </>
+  )
+
   return (
     <ThemeProvider theme={userManagementTheme}>
-      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
-        {/* Topbar */}
-        <Topbar
-          title="Smart Mill Scale"
-          subtitle="Manajemen Pengguna"
-          currentUser={currentUser}
-          onLogout={onLogout}
-          onNavigate={onNavigate}
-        />
-
-        {/* Quick Actions Bar */}
-        <Box sx={{ bgcolor: '#1f2937', borderBottom: '1px solid #374151', py: 1, px: 3 }}>
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
+      <PageShell
+        title="Smart Mill Scale"
+        subtitle="Manajemen Pengguna"
+        currentUser={currentUser}
+        onLogout={onLogout}
+        onNavigate={onNavigate}
+        pageTitle="Manajemen Pengguna"
+        pageDescription="Kelola akun dan izin akses dengan data grid yang tetap usable pada laptop maupun desktop."
+        pageActions={pageActions}
+        contentWidth="full"
+      >
+        <Box sx={{ bgcolor: 'background.default' }}>
+          <Box sx={{ mb: 3, borderRadius: 3, border: '1px solid #374151', bgcolor: '#111827', px: 2, py: 1.5 }}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="flex-end">
             <Tooltip title="Profil Saya">
               <IconButton size="small" onClick={() => setShowProfileDialog(true)} sx={{ color: '#9ca3af' }}>
                 <AccountCircle />
@@ -220,11 +250,10 @@ const UserManagementMUI = ({ currentUser, wails: wailsProp, onNavigate, onLogout
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
-          </Stack>
-        </Box>
+            </Stack>
+          </Box>
 
-        {/* Main Content */}
-        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+          <Container maxWidth={false} disableGutters sx={{ mb: 4 }}>
           {/* Stats Cards */}
           <Grid container spacing={3} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={6} md={3}>
@@ -273,36 +302,8 @@ const UserManagementMUI = ({ currentUser, wails: wailsProp, onNavigate, onLogout
             </Grid>
           </Grid>
 
-          {/* Action Buttons */}
-          <Box sx={{ mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setShowCreateDialog(true)}
-            >
-              Buat User
-            </Button>
-            <Button
-              variant="outlined"
-              startIcon={<ExportIcon />}
-              onClick={() => setShowExportImportDialog(true)}
-            >
-              Export / Import
-            </Button>
-            {selectedUsers.length > 0 && (
-              <Button
-                variant="outlined"
-                color="error"
-                startIcon={<DeleteIcon />}
-                onClick={handleBulkDeleteClick}
-              >
-                Hapus ({selectedUsers.length})
-              </Button>
-            )}
-          </Box>
-
           {/* Data Grid */}
-          <Card>
+          <Card sx={{ overflowX: 'auto' }}>
             <CardContent>
               <UserDataGrid
                 users={users}
@@ -316,13 +317,14 @@ const UserManagementMUI = ({ currentUser, wails: wailsProp, onNavigate, onLogout
               />
             </CardContent>
           </Card>
-        </Container>
+          </Container>
+        </Box>
 
         {/* Floating Action Button */}
         <Fab
           color="primary"
           aria-label="add"
-          sx={{ position: 'fixed', bottom: 16, right: 16 }}
+          sx={{ position: 'fixed', bottom: 24, right: 24 }}
           onClick={() => setShowCreateDialog(true)}
         >
           <AddIcon />
@@ -472,7 +474,7 @@ const UserManagementMUI = ({ currentUser, wails: wailsProp, onNavigate, onLogout
             {error || successMessage}
           </Alert>
         </Snackbar>
-      </Box>
+      </PageShell>
     </ThemeProvider>
   )
 }

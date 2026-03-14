@@ -15,9 +15,9 @@ const TransactionHeaderSection = ({
   const isTimbang1 = mode === 'timbang1'
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-3 xl:flex-row xl:items-center">
       {/* Label + Input inline */}
-      <label className="flex-shrink-0 w-32 text-sm font-medium text-gray-300">
+      <label className="flex-shrink-0 text-sm font-medium text-gray-300 xl:w-32">
         No. Transaksi
       </label>
 
@@ -25,7 +25,7 @@ const TransactionHeaderSection = ({
         type="text"
         value={transactionNumber}
         onChange={(e) => onTransactionNumberChange(e.target.value.toUpperCase())}
-        className="flex-1 px-4 py-2 rounded bg-gray-700 text-white border border-gray-600 focus:border-blue-500 focus:outline-none"
+        className="w-full flex-1 rounded border border-gray-600 bg-gray-700 px-4 py-2 text-white focus:border-blue-500 focus:outline-none"
         disabled={isSubmitting}
       />
 
@@ -34,7 +34,7 @@ const TransactionHeaderSection = ({
         <button
           type="button"
           onClick={onOpenPendingList}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex-shrink-0"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 xl:flex-shrink-0"
           title="Lihat Daftar Pending Timbang 2"
         >
           <List className="w-4 h-4" />

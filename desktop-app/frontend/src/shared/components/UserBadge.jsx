@@ -165,7 +165,7 @@ const UserBadge = ({ user, onLogout, onNavigate }) => {
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         aria-expanded={isDropdownOpen}
         aria-haspopup="true"
-        className="flex items-center space-x-3 bg-gray-800/80 hover:bg-gray-700/80 border border-gray-600 rounded-lg px-4 py-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex max-w-full items-center gap-2 rounded-xl border border-gray-700 bg-gray-900/80 px-3 py-2 transition-all duration-200 hover:bg-gray-800/90 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:px-4"
       >
         {/* User Avatar */}
         <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center">
@@ -173,9 +173,9 @@ const UserBadge = ({ user, onLogout, onNavigate }) => {
         </div>
 
         {/* User Info */}
-        <div className="text-left">
-          <p className="text-white font-medium text-sm">{user.fullName}</p>
-          <p className="text-gray-400 text-xs">{userRole.label}</p>
+        <div className="min-w-0 text-left">
+          <p className="truncate text-sm font-medium text-white">{user.fullName}</p>
+          <p className="hidden truncate text-xs text-gray-400 sm:block">{userRole.label}</p>
         </div>
 
         {/* Dropdown Arrow */}
@@ -189,7 +189,7 @@ const UserBadge = ({ user, onLogout, onNavigate }) => {
         <div
           role="menu"
           aria-labelledby="user-menu-button"
-          className="absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50"
+          className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-gray-600 bg-gray-800 shadow-xl z-50"
         >
           {/* User Info Header */}
           <div className="px-4 py-3 border-b border-gray-700">

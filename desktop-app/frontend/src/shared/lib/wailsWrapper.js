@@ -61,6 +61,49 @@ export function createMockWailsWrapper() {
     try {
         const eventListeners = new Map()
         const nowIso = () => new Date().toISOString()
+        const createMockUserRecord = ({
+            id,
+            username,
+            full_name,
+            email,
+            role,
+            active = true,
+            must_change_password = false,
+        }) => ({
+            id,
+            username,
+            full_name,
+            email,
+            role,
+            active,
+            must_change_password,
+            created_at: nowIso(),
+            updated_at: nowIso(),
+            last_login_at: null,
+        })
+        let mockUsers = [
+            createMockUserRecord({
+                id: 'mock-user-1',
+                username: 'admin',
+                full_name: 'Mock Admin',
+                email: 'admin@example.com',
+                role: 'ADMIN',
+            }),
+            createMockUserRecord({
+                id: 'mock-user-2',
+                username: 'supervisor',
+                full_name: 'Mock Supervisor',
+                email: 'supervisor@example.com',
+                role: 'SUPERVISOR',
+            }),
+            createMockUserRecord({
+                id: 'mock-user-3',
+                username: 'operator',
+                full_name: 'Mock Operator',
+                email: 'operator@example.com',
+                role: 'TIMBANGAN',
+            }),
+        ]
         let masterSyncStatus = {
             syncInProgress: false,
             lastAttemptAt: null,
@@ -70,7 +113,7 @@ export function createMockWailsWrapper() {
 
     return {
         // Mock authentication methods
-        Login: async (username, password) => {
+        Login: async (username, _password) => {
             console.log('[Mock] Login:', username)
             // Simulate successful login
             return JSON.stringify({
@@ -132,6 +175,171 @@ export function createMockWailsWrapper() {
                     }
                 }
             })
+        },
+
+        GetAllUsers: async () => {
+            console.log('[Mock] GetAllUsers')
+            return {
+                success: true,
+                data: mockUsers.map((user) => ({
+                    id: user.id,
+                    username: user.username,
+                    fullName: user.full_name,
+                    email: user.email,
+                    role: user.role,
+                    isActive: Boolean(user.active),
+                    mustChangePassword: Boolean(user.must_change_password),
+                    createdAt: user.created_at,
+                    updatedAt: user.updated_at,
+                    lastLoginAt: user.last_login_at,
+                })),
+            }
+        },
+
+        CreateUser: async (username, password, email, fullName, role) => {
+            console.log('[Mock] CreateUser', username)
+            const createdUser = createMockUserRecord({
+                id: `mock-user-${mockUsers.length + 1}`,
+                username,
+                full_name: fullName,
+                email,
+                role: role?.toUpperCase?.() || 'TIMBANGAN',
+                must_change_password: false,
+            })
+            mockUsers = [createdUser, ...mockUsers]
+            return { success: true, data: createdUser }
+        },
+
+        UpdateUser: async (userID, fullName, email, role, isActive) => {
+            console.log('[Mock] UpdateUser', userID)
+            mockUsers = mockUsers.map((user) =>
+                user.id === userID
+                    ? {
+                        ...user,
+                        full_name: fullName,
+                        email,
+                        role: role?.toUpperCase?.() || user.role,
+                        active: isActive === 'true',
+                        updated_at: nowIso(),
+                    }
+                    : user
+            )
+            return { success: true }
+        },
+
+        DeleteUser: async (userID) => {
+            console.log('[Mock] DeleteUser', userID)
+            mockUsers = mockUsers.map((user) =>
+                user.id === userID
+                    ? { ...user, active: false, updated_at: nowIso() }
+                    : user
+            )
+            return { success: true }
+        },
+
+        ResetUserPassword: async (userID) => {
+            console.log('[Mock] ResetUserPassword', userID)
+            mockUsers = mockUsers.map((user) =>
+                user.id === userID
+                    ? { ...user, must_change_password: true, updated_at: nowIso() }
+                    : user
+            )
+            return {
+                success: true,
+                data: { newPassword: 'MockPass123' },
+            }
+        },
+
+        UpdateOwnProfile: async (fullName, email) => {
+            console.log('[Mock] UpdateOwnProfile')
+            mockUsers = mockUsers.map((user) =>
+                user.id === 'mock-user-1'
+                    ? { ...user, full_name: fullName, email, updated_at: nowIso() }
+                    : user
+            )
+            return { success: true }
+        },
+
+        ChangePassword: async () => {
+            console.log('[Mock] ChangePassword')
+            return { success: true }
+        },
+
+        ExportUsersToCSV: async (includeInactive) => {
+            console.log('[Mock] ExportUsersToCSV', includeInactive)
+            const rows = mockUsers
+                .filter((user) => includeInactive || user.active)
+                .map((user) =>
+                    [
+                        user.id,
+                        user.username,
+                        user.full_name,
+                        user.email,
+                        user.role,
+                        user.active,
+                        user.must_change_password,
+                        user.created_at,
+                        user.last_login_at || '',
+                    ].join(',')
+                )
+            return {
+                success: true,
+                data: {
+                    csv: [
+                        'ID,Username,Full Name,Email,Role,Is Active,Must Change Password,Created At,Last Login At',
+                        ...rows,
+                    ].join('\n'),
+                },
+            }
+        },
+
+        ImportUsersFromCSV: async (csvData) => {
+            console.log('[Mock] ImportUsersFromCSV')
+            const rows = String(csvData || '')
+                .split(/\r?\n/)
+                .slice(1)
+                .filter(Boolean)
+
+            const results = rows.map((row, index) => {
+                const [username, fullName, email, role] = row.split(',')
+                const createdUser = createMockUserRecord({
+                    id: `mock-user-import-${Date.now()}-${index}`,
+                    username: username?.trim() || `imported-${index}`,
+                    full_name: fullName?.trim() || 'Imported User',
+                    email: email?.trim() || '',
+                    role: role?.trim()?.toUpperCase?.() || 'TIMBANGAN',
+                })
+                mockUsers = [createdUser, ...mockUsers]
+                return {
+                    row: index + 2,
+                    username: createdUser.username,
+                    success: true,
+                }
+            })
+
+            return {
+                success: true,
+                message: 'Import selesai',
+                data: {
+                    successCount: results.length,
+                    failureCount: 0,
+                    results,
+                },
+            }
+        },
+
+        BulkDeleteUsers: async (userIDs) => {
+            console.log('[Mock] BulkDeleteUsers', userIDs)
+            const idSet = new Set(Array.isArray(userIDs) ? userIDs : [])
+            mockUsers = mockUsers.map((user) =>
+                idSet.has(user.id)
+                    ? { ...user, active: false, updated_at: nowIso() }
+                    : user
+            )
+            return {
+                success: true,
+                message: `${idSet.size} user berhasil dihapus`,
+            }
         },
 
         // Mock backend methods

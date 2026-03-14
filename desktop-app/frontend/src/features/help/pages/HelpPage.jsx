@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../../auth'
 import { helpContent, getHelpByRole } from '../data/helpContent'
-import { Topbar } from '../../../shared'
+import { PageShell } from '../../../shared'
 
 const HelpPage = ({ currentUser, wails, onNavigate, onLogout }) => {
   const { user } = useAuthStore()
@@ -52,19 +52,17 @@ const HelpPage = ({ currentUser, wails, onNavigate, onLogout }) => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Topbar */}
-      <Topbar
-        title="Smart Mill Scale"
-        subtitle="Bantuan"
-        currentUser={currentUser}
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-      />
-
-      {/* Search Bar */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <PageShell
+      title="Smart Mill Scale"
+      subtitle="Bantuan"
+      currentUser={currentUser}
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      pageTitle="Pusat Bantuan"
+      pageDescription="Panduan, troubleshooting, dan referensi sistem yang tetap nyaman dibaca pada resolusi laptop maupun desktop."
+      contentWidth="standard"
+    >
+      <div className="rounded-2xl border border-gray-700 bg-gray-800 px-4 py-4 sm:px-6">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
@@ -75,29 +73,30 @@ const HelpPage = ({ currentUser, wails, onNavigate, onLogout }) => {
               className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-        </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="pt-6">
         {/* Tabs */}
-        <div className="flex space-x-1 mb-8 border-b border-gray-700">
-          {tabs.map(tab => {
-            const IconComponent = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-3 border-b-2 transition-colors duration-200 ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-400'
-                    : 'border-transparent text-gray-400 hover:text-gray-300'
-                }`}
-              >
-                <IconComponent className="w-5 h-5" />
-                <span>{tab.label}</span>
-              </button>
-            )
-          })}
+        <div className="mb-8 overflow-x-auto border-b border-gray-700">
+          <div className="flex min-w-max gap-1">
+            {tabs.map(tab => {
+              const IconComponent = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 whitespace-nowrap px-4 py-3 border-b-2 transition-colors duration-200 ${
+                    activeTab === tab.id
+                      ? 'border-blue-500 text-blue-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-300'
+                  }`}
+                >
+                  <IconComponent className="w-5 h-5" />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Tab Content */}
@@ -389,7 +388,7 @@ const HelpPage = ({ currentUser, wails, onNavigate, onLogout }) => {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   )
 }
 

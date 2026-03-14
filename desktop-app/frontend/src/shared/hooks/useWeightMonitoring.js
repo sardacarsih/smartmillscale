@@ -232,9 +232,10 @@ const useWeightMonitoring = (options = {}) => {
         unsubscribeRef.current()
       }
 
-      // Note: EventCoordinator tetap aktif globally, monitoring lifecycle dikelola oleh store
-      // Components should explicitly call stop() if they need to stop monitoring
-      // This allows monitoring to persist across page navigation
+      // Explicit cleanup remains opt-in so page navigation can keep monitoring alive.
+      if (autoCleanup && isMonitoringRef.current) {
+        stopMonitoring(null, { force: true })
+      }
     }
     // Only re-run when configuration changes, not when state changes
     // Cleanup function captures current values via closure

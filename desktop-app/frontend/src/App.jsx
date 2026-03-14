@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 // Feature imports
 import { LoginPage, LockScreen, useAuthStore } from './features/auth'
 // Shared imports
@@ -261,6 +261,35 @@ function App() {
       setPersistent(true)
     }
   }, [isAuthenticated])
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || typeof window === 'undefined') {
+      return undefined
+    }
+
+    window.__SMART_MILL_TEST_HOOKS__ = {
+      isServicesInitialized: () => servicesInitialized,
+      setAuthenticatedUser: ({ user: nextUser, session: nextSession, page = 'dashboard' }) => {
+        useAuthStore.getState().setAuthenticated(true, nextUser, nextSession)
+        useNavigationStore.getState().resetNavigation()
+        if (page && page !== 'dashboard') {
+          useNavigationStore.getState().navigateTo(page)
+        }
+      },
+      logout: () => {
+        useAuthStore.getState().forceLogout()
+      },
+      navigateTo: (page) => {
+        if (page) {
+          useNavigationStore.getState().navigateTo(page)
+        }
+      }
+    }
+
+    return () => {
+      delete window.__SMART_MILL_TEST_HOOKS__
+    }
+  }, [servicesInitialized])
 
   // Loading states
   if (!wailsReady || !wails) {

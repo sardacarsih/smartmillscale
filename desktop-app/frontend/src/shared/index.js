@@ -4,6 +4,7 @@
 export { default as Notification } from './components/Notification'
 export { default as UserBadge } from './components/UserBadge'
 export { default as Topbar } from './components/Topbar'
+export { default as PageShell } from './components/PageShell'
 export { default as ErrorBoundary } from './components/ErrorBoundary'
 export { default as VirtualList } from './components/VirtualList'
 export { default as LazyImage } from './components/LazyImage'

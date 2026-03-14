@@ -38,7 +38,7 @@ const AdminDashboard = ({ wails }) => {
 
   if (dashboardLoading || metricsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white">Loading admin dashboard...</p>
@@ -50,7 +50,7 @@ const AdminDashboard = ({ wails }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
           <p className="text-gray-400 mt-1">Complete system overview and management</p>
@@ -246,7 +246,7 @@ const AdminDashboard = ({ wails }) => {
 
       {/* Additional Metrics */}
       {metrics && Object.keys(metrics).length > 4 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {Object.entries(metrics).slice(4).map(([key, metric]) => (
             <MetricCard key={key} metric={metric} />
           ))}

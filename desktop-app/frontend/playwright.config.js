@@ -1,3 +1,4 @@
+/* eslint-env node */
 import { defineConfig, devices } from '@playwright/test'
 
 /**
@@ -33,7 +34,7 @@ export default defineConfig({
     // Shared settings for all projects
     use: {
         // Base URL for Wails dev server
-        baseURL: 'http://localhost:5173',
+        baseURL: 'http://127.0.0.1:5173',
 
         // Collect trace when retrying failed test
         trace: 'on-first-retry',
@@ -65,7 +66,7 @@ export default defineConfig({
     // Run Wails dev server before starting tests
     webServer: {
         command: 'npm run dev',
-        url: 'http://localhost:5173',
+        url: 'http://127.0.0.1:5173',
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000,
     },

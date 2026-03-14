@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import useWeightMonitoring from './useWeightMonitoring.js'
 import useGlobalWeightStore from '../store/useGlobalWeightStore.js'
+import eventCoordinator from '../services/EventCoordinator.js'
 
 // Mock console methods
 const originalConsoleLog = console.log
@@ -37,6 +38,7 @@ describe('useWeightMonitoring Hook - Pengawasan Berat', () => {
                 subscribers: new Map()
             })
         })
+        eventCoordinator.cleanup()
 
         // Create mock Wails instance
         mockWails = {
@@ -165,7 +167,7 @@ describe('useWeightMonitoring Hook - Pengawasan Berat', () => {
 
             // Set monitoring state to true
             act(() => {
-                useGlobalWeightStore.getState().isMonitoring = true
+                useGlobalWeightStore.setState({ isMonitoring: true })
             })
 
             unmount()
@@ -193,7 +195,7 @@ describe('useWeightMonitoring Hook - Pengawasan Berat', () => {
 
             // Change monitoring state
             act(() => {
-                useGlobalWeightStore.getState().isMonitoring = true
+                useGlobalWeightStore.setState({ isMonitoring: true })
             })
 
             // Force re-render
@@ -272,7 +274,7 @@ describe('useWeightMonitoring Hook - Pengawasan Berat', () => {
             })
 
             act(() => {
-                useGlobalWeightStore.getState().isMonitoring = true
+                useGlobalWeightStore.setState({ isMonitoring: true })
             })
 
             await act(async () => {
@@ -360,10 +362,9 @@ describe('useWeightMonitoring Hook - Pengawasan Berat', () => {
                 expect(result.current.isInitialized).toBe(true)
             })
 
-            // Simulate weight update from store
+            // Simulate a global event update
             act(() => {
-                const store = useGlobalWeightStore.getState()
-                store.notifySubscribers('weight_updated', { weight: 12000, stable: true, connected: true })
+                eventCoordinator.distributeToSubscribers('weight_updated', { weight: 12000, stable: true, connected: true })
             })
 
             await waitFor(() => {
@@ -390,10 +391,9 @@ describe('useWeightMonitoring Hook - Pengawasan Berat', () => {
                 expect(result.current.isInitialized).toBe(true)
             })
 
-            // Simulate connection change from store
+            // Simulate connection change from the coordinator
             act(() => {
-                const store = useGlobalWeightStore.getState()
-                store.notifySubscribers('connection_change', { connected: true })
+                eventCoordinator.distributeToSubscribers('connection_change', { connected: true })
             })
 
             await waitFor(() => {
@@ -417,10 +417,9 @@ describe('useWeightMonitoring Hook - Pengawasan Berat', () => {
                 expect(result.current.isInitialized).toBe(true)
             })
 
-            // Simulate stability change from store
+            // Simulate a global event update
             act(() => {
-                const store = useGlobalWeightStore.getState()
-                store.notifySubscribers('weight_updated', { weight: 12000, stable: true, connected: true })
+                eventCoordinator.distributeToSubscribers('weight_updated', { weight: 12000, stable: true, connected: true })
             })
 
             await waitFor(() => {

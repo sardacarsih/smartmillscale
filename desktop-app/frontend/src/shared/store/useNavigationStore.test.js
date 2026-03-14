@@ -19,113 +19,103 @@ describe('useNavigationStore', () => {
 
     describe('Fungsi navigateTo', () => {
         it('harus navigate ke halaman baru', () => {
-            const store = useNavigationStore.getState()
+            useNavigationStore.getState().navigateTo('timbang1')
 
-            store.navigateTo('timbang1')
-
-            expect(store.currentPage).toBe('timbang1')
-            expect(store.navigationHistory).toEqual(['dashboard', 'timbang1'])
+            const freshState = useNavigationStore.getState()
+            expect(freshState.currentPage).toBe('timbang1')
+            expect(freshState.navigationHistory).toEqual(['dashboard', 'timbang1'])
         })
 
         it('harus menambahkan halaman ke history', () => {
-            const store = useNavigationStore.getState()
+            useNavigationStore.getState().navigateTo('master-data')
+            useNavigationStore.getState().navigateTo('users')
+            useNavigationStore.getState().navigateTo('profile')
 
-            store.navigateTo('master-data')
-            store.navigateTo('users')
-            store.navigateTo('profile')
-
-            expect(store.navigationHistory).toEqual(['dashboard', 'master-data', 'users', 'profile'])
-            expect(store.currentPage).toBe('profile')
+            const freshState = useNavigationStore.getState()
+            expect(freshState.navigationHistory).toEqual(['dashboard', 'master-data', 'users', 'profile'])
+            expect(freshState.currentPage).toBe('profile')
         })
 
         it('harus menghindari duplikasi halaman yang sama di history', () => {
-            const store = useNavigationStore.getState()
+            useNavigationStore.getState().navigateTo('timbang1')
+            useNavigationStore.getState().navigateTo('timbang1')
+            useNavigationStore.getState().navigateTo('timbang1')
 
-            store.navigateTo('timbang1')
-            store.navigateTo('timbang1')
-            store.navigateTo('timbang1')
-
-            expect(store.navigationHistory).toEqual(['dashboard', 'timbang1'])
-            expect(store.currentPage).toBe('timbang1')
+            const freshState = useNavigationStore.getState()
+            expect(freshState.navigationHistory).toEqual(['dashboard', 'timbang1'])
+            expect(freshState.currentPage).toBe('timbang1')
         })
 
         it('harus navigate ke semua halaman yang tersedia', () => {
-            const store = useNavigationStore.getState()
             const pages = ['dashboard', 'timbang1', 'master-data', 'users', 'audit', 'profile', 'help', 'settings']
 
-            pages.forEach((page, index) => {
-                store.navigateTo(page)
-                expect(store.currentPage).toBe(page)
+            pages.forEach((page) => {
+                useNavigationStore.getState().navigateTo(page)
+                expect(useNavigationStore.getState().currentPage).toBe(page)
             })
         })
     })
 
     describe('Fungsi setCurrentPage', () => {
         it('harus set current page tanpa mengupdate history', () => {
-            const store = useNavigationStore.getState()
-            const initialHistory = [...store.navigationHistory]
+            const initialHistory = [...useNavigationStore.getState().navigationHistory]
 
-            store.setCurrentPage('profile')
+            useNavigationStore.getState().setCurrentPage('profile')
 
-            expect(store.currentPage).toBe('profile')
-            expect(store.navigationHistory).toEqual(initialHistory)
+            const freshState = useNavigationStore.getState()
+            expect(freshState.currentPage).toBe('profile')
+            expect(freshState.navigationHistory).toEqual(initialHistory)
         })
     })
 
     describe('Fungsi goBack', () => {
         it('harus kembali ke halaman sebelumnya', () => {
-            const store = useNavigationStore.getState()
+            useNavigationStore.getState().navigateTo('timbang1')
+            useNavigationStore.getState().navigateTo('master-data')
 
-            store.navigateTo('timbang1')
-            store.navigateTo('master-data')
+            useNavigationStore.getState().goBack()
 
-            store.goBack()
-
-            expect(store.currentPage).toBe('timbang1')
-            expect(store.navigationHistory).toEqual(['dashboard', 'timbang1'])
+            const freshState = useNavigationStore.getState()
+            expect(freshState.currentPage).toBe('timbang1')
+            expect(freshState.navigationHistory).toEqual(['dashboard', 'timbang1'])
         })
 
         it('harus navigate ke dashboard jika tidak ada history', () => {
-            const store = useNavigationStore.getState()
+            useNavigationStore.setState({ currentPage: 'profile', navigationHistory: [] })
+            useNavigationStore.getState().goBack()
 
-            // Clear history manually
-            store.navigationHistory = []
-            store.goBack()
-
-            expect(store.currentPage).toBe('dashboard')
-            expect(store.navigationHistory).toEqual(['dashboard'])
+            const freshState = useNavigationStore.getState()
+            expect(freshState.currentPage).toBe('dashboard')
+            expect(freshState.navigationHistory).toEqual(['dashboard'])
         })
 
         it('harus handle multiple back navigations', () => {
-            const store = useNavigationStore.getState()
+            useNavigationStore.getState().navigateTo('timbang1')
+            useNavigationStore.getState().navigateTo('master-data')
+            useNavigationStore.getState().navigateTo('users')
 
-            store.navigateTo('timbang1')
-            store.navigateTo('master-data')
-            store.navigateTo('users')
+            useNavigationStore.getState().goBack() // users -> master-data
+            expect(useNavigationStore.getState().currentPage).toBe('master-data')
 
-            store.goBack() // users -> master-data
-            expect(store.currentPage).toBe('master-data')
+            useNavigationStore.getState().goBack() // master-data -> timbang1
+            expect(useNavigationStore.getState().currentPage).toBe('timbang1')
 
-            store.goBack() // master-data -> timbang1
-            expect(store.currentPage).toBe('timbang1')
-
-            store.goBack() // timbang1 -> dashboard
-            expect(store.currentPage).toBe('dashboard')
+            useNavigationStore.getState().goBack() // timbang1 -> dashboard
+            expect(useNavigationStore.getState().currentPage).toBe('dashboard')
         })
     })
 
     describe('Fungsi resetNavigation', () => {
         it('harus reset navigation ke dashboard', () => {
-            const store = useNavigationStore.getState()
+            useNavigationStore.getState().navigateTo('timbang1')
+            useNavigationStore.getState().navigateTo('master-data')
+            useNavigationStore.getState().navigateTo('users')
 
-            store.navigateTo('timbang1')
-            store.navigateTo('master-data')
-            store.navigateTo('users')
+            useNavigationStore.getState().resetNavigation()
 
-            store.resetNavigation()
-
-            expect(store.currentPage).toBe('dashboard')
-            expect(store.navigationHistory).toEqual(['dashboard'])
+            const freshState = useNavigationStore.getState()
+            expect(freshState.currentPage).toBe('dashboard')
+            expect(freshState.navigationHistory).toEqual(['dashboard'])
         })
     })
 

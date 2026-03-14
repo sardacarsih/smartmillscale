@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Search, Filter, Calendar, User, Shield, Activity, AlertCircle, CheckCircle, XCircle, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Topbar } from '../../../shared'
+import { PageShell } from '../../../shared'
 
 // Initialize Wails bindings if available
 function initializeWailsBindings() {
@@ -203,24 +203,18 @@ const AuditLogViewer = ({ currentUser, wails: wailsProp, onNavigate, onLogout })
   const filteredLogs = getFilteredLogs()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Topbar */}
-      <Topbar
-        title="Smart Mill Scale"
-        subtitle="Audit Log"
-        currentUser={currentUser}
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-      />
-
-      {/* Main Content */}
-      <div className="p-6">
+    <PageShell
+      title="Smart Mill Scale"
+      subtitle="Audit Log"
+      currentUser={currentUser}
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      pageTitle="Riwayat Audit"
+      pageDescription="Riwayat aktivitas dan kejadian sistem dengan filter dan tabel yang tetap dapat digunakan pada resolusi laptop."
+      contentWidth="wide"
+    >
+      <div className="space-y-6">
         <div className="mb-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-2">Riwayat Audit</h2>
-            <p className="text-gray-400">Riwayat aktivitas dan kejadian sistem</p>
-          </div>
-
         {/* Search and Filters */}
         <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           <div className="flex-1 flex flex-col sm:flex-row gap-4">
@@ -250,7 +244,7 @@ const AuditLogViewer = ({ currentUser, wails: wailsProp, onNavigate, onLogout })
           </div>
 
           {/* Stats */}
-          <div className="flex items-center space-x-4 text-sm">
+          <div className="flex flex-wrap items-center gap-4 text-sm">
             <div className="flex items-center space-x-2 text-gray-400">
               <Activity className="w-4 h-4" />
               <span>Total: {totalLogs}</span>
@@ -310,7 +304,7 @@ const AuditLogViewer = ({ currentUser, wails: wailsProp, onNavigate, onLogout })
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Rentang Tanggal
                 </label>
-                <div className="flex space-x-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     type="date"
                     value={dateRange.start}
@@ -346,7 +340,7 @@ const AuditLogViewer = ({ currentUser, wails: wailsProp, onNavigate, onLogout })
       </div>
 
       {/* Logs Table */}
-      <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-lg overflow-hidden">
+      <div className="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800/50 backdrop-blur-sm">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-white">Memuat audit log...</div>
@@ -445,11 +439,11 @@ const AuditLogViewer = ({ currentUser, wails: wailsProp, onNavigate, onLogout })
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="px-6 py-4 bg-gray-700/30 flex items-center justify-between">
+              <div className="flex flex-col gap-3 bg-gray-700/30 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="text-gray-400 text-sm">
                   Menampilkan {filteredLogs.length} dari {totalLogs} log
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
@@ -474,7 +468,7 @@ const AuditLogViewer = ({ currentUser, wails: wailsProp, onNavigate, onLogout })
         )}
         </div>
       </div>
-    </div>
+    </PageShell>
   )
 }
 

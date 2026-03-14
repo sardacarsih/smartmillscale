@@ -18,7 +18,7 @@ const RoleDashboard = ({ wails }) => {
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <p className="text-white text-lg">Please log in to view your dashboard</p>
         </div>
@@ -51,7 +51,7 @@ const RoleDashboard = ({ wails }) => {
       default:
         console.error('[RoleDashboard] Invalid role:', user.role, 'normalized:', normalizedRole)
         return (
-          <div className="flex items-center justify-center min-h-screen">
+          <div className="flex min-h-[40vh] items-center justify-center">
             <div className="text-center">
               <p className="text-red-400 text-lg">Invalid user role: {user.role}</p>
               <p className="text-gray-400 mt-2">Expected one of: ADMIN, SUPERVISOR, TIMBANGAN, GRADING</p>

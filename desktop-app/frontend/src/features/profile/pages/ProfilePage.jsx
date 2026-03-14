@@ -3,7 +3,7 @@ import { useAuthStore } from '../../auth'
 import useProfileStore from '../store/useProfileStore'
 import ProfileInfo from '../components/ProfileInfo'
 import ChangePassword from '../components/ChangePassword'
-import { Topbar } from '../../../shared'
+import { PageShell } from '../../../shared'
 
 const ProfilePage = ({ currentUser, wails, onNavigate, onLogout }) => {
   const { user } = useAuthStore()
@@ -27,18 +27,17 @@ const ProfilePage = ({ currentUser, wails, onNavigate, onLogout }) => {
   }, [user, setProfile])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Topbar */}
-      <Topbar
-        title="Smart Mill Scale"
-        subtitle="Profil Saya"
-        currentUser={currentUser}
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-      />
-
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <PageShell
+      title="Smart Mill Scale"
+      subtitle="Profil Saya"
+      currentUser={currentUser}
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      pageTitle="Profil Saya"
+      pageDescription="Ringkasan akun, keamanan, dan sesi aktif dengan layout yang turun rapi pada layar laptop."
+      contentWidth="standard"
+    >
+      <div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Profile Information */}
           <div>
@@ -117,7 +116,7 @@ const ProfilePage = ({ currentUser, wails, onNavigate, onLogout }) => {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   )
 }
 

@@ -234,7 +234,7 @@ const APIKeyTable = ({
   }
 
   return (
-    <Box sx={{ height: 500, width: '100%' }}>
+    <Box sx={{ height: 'clamp(400px, 52vh, 560px)', width: '100%', overflowX: 'auto' }}>
       <DataGrid
         rows={apiKeys}
         columns={columns}
@@ -254,6 +254,7 @@ const APIKeyTable = ({
         }}
         pageSizeOptions={[5, 10, 20, 50]}
         sx={{
+          minWidth: 1080,
           '& .MuiDataGrid-root': {
             border: 'none',
           },

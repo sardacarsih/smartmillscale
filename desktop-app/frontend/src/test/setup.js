@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, vi } from 'vitest'
+
 // Test setup file for Vitest
 // This file runs before each test file
 
@@ -5,25 +7,27 @@
 const originalConsoleError = console.error
 const originalConsoleLog = console.log
 const originalConsoleWarn = console.warn
+const nodeEnv = globalThis.process?.env?.['NODE_ENV']
+const vitestDebug = Boolean(globalThis.process?.env?.['VITEST_DEBUG'])
 
 // Setup global test environment
-global.console = {
+globalThis.console = {
   ...console,
   // Keep error logs for debugging test failures
   error: (...args) => {
     // Only show error logs in test failures
-    if (process.env.NODE_ENV === 'test') {
+    if (nodeEnv === 'test') {
       originalConsoleError(...args)
     }
   },
   // Suppress log and warn messages during tests unless debugging
   log: (...args) => {
-    if (process.env.VITEST_DEBUG) {
+    if (vitestDebug) {
       originalConsoleLog(...args)
     }
   },
   warn: (...args) => {
-    if (process.env.VITEST_DEBUG) {
+    if (vitestDebug) {
       originalConsoleWarn(...args)
     }
   }
@@ -31,7 +35,7 @@ global.console = {
 
 // Mock window and browser APIs that might not be available in test environment
 if (typeof window === 'undefined') {
-  global.window = {}
+  globalThis.window = {}
 }
 
 // Mock localStorage for tests
@@ -41,7 +45,7 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 }
-global.localStorage = localStorageMock
+globalThis.localStorage = localStorageMock
 
 // Mock sessionStorage for tests
 const sessionStorageMock = {
@@ -50,7 +54,7 @@ const sessionStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 }
-global.sessionStorage = sessionStorageMock
+globalThis.sessionStorage = sessionStorageMock
 
 // Mock setTimeout and setInterval for testing
 // global.setTimeout = vi.fn()
@@ -59,7 +63,7 @@ global.sessionStorage = sessionStorageMock
 // global.clearInterval = vi.fn()
 
 // Performance API mock
-global.performance = {
+globalThis.performance = {
   now: vi.fn(() => Date.now()),
 }
 

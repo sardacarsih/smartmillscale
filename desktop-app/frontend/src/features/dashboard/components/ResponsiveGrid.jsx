@@ -4,6 +4,15 @@
  */
 import { useState, useEffect } from 'react'
 
+const GRID_COL_CLASS = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
+  5: 'grid-cols-5',
+  6: 'grid-cols-6'
+}
+
 const ResponsiveGrid = ({
   children,
   className = "",
@@ -48,7 +57,7 @@ const ResponsiveGrid = ({
   }
 
   const gridCols = getColsForScreen()
-  const gridClass = `grid grid-cols-${gridCols} ${getGapClass()} ${className}`
+  const gridClass = `grid ${GRID_COL_CLASS[gridCols] || GRID_COL_CLASS[1]} ${getGapClass()} ${className}`
 
   return (
     <div className={gridClass}>

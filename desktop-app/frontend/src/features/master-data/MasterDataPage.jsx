@@ -18,7 +18,7 @@ const SupplierTab = lazy(() => import('./tabs/SupplierTab'));
 const EstateTab = lazy(() => import('./tabs/EstateTab'));
 const AfdelingTab = lazy(() => import('./tabs/AfdelingTab'));
 const BlokTab = lazy(() => import('./tabs/BlokTab'));
-import { Topbar } from '../../shared';
+import { PageShell } from '../../shared';
 
 /**
  * MasterDataPage Component
@@ -210,17 +210,18 @@ const MasterDataPage = ({ currentUser, wails, onNavigate, onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <Topbar
-        title="Smart Mill Scale"
-        subtitle="Master Data PKS"
-        currentUser={currentUser}
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-      />
-
-      <div className="bg-gray-800 shadow-sm border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <PageShell
+      title="Smart Mill Scale"
+      subtitle="Master Data PKS"
+      currentUser={currentUser}
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      pageTitle="Master Data"
+      pageDescription="Kelola seluruh master data PKS dengan status sinkronisasi yang tetap terbaca jelas pada laptop dan desktop."
+      contentWidth="wide"
+    >
+      <div className="rounded-2xl border border-gray-700 bg-gray-800 shadow-sm">
+        <div className="px-4 sm:px-6 lg:px-8">
           <div className="py-6">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -278,8 +279,8 @@ const MasterDataPage = ({ currentUser, wails, onNavigate, onLogout }) => {
               )}
             </div>
 
-            <div className="mt-6">
-              <nav className="flex space-x-1" aria-label="Tabs">
+            <div className="mt-6 overflow-x-auto">
+              <nav className="flex min-w-max space-x-1" aria-label="Tabs">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeEntity === tab.id;
@@ -316,25 +317,23 @@ const MasterDataPage = ({ currentUser, wails, onNavigate, onLogout }) => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-gray-800 rounded-lg shadow-sm border border-gray-700 p-6">
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                  <p className="text-gray-400">Loading master data...</p>
-                </div>
+      <div className="mt-6 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-sm sm:p-6">
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p className="text-gray-400">Loading master data...</p>
               </div>
-            }
-          >
-            <ActiveTabComponent syncRefreshToken={syncRefreshToken} />
-          </Suspense>
-        </div>
+            </div>
+          }
+        >
+          <ActiveTabComponent syncRefreshToken={syncRefreshToken} />
+        </Suspense>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-4">
+      <div className="mt-6">
+        <div className="rounded-xl border border-blue-700/50 bg-blue-900/30 p-4">
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
@@ -352,7 +351,7 @@ const MasterDataPage = ({ currentUser, wails, onNavigate, onLogout }) => {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 };
 

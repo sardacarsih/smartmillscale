@@ -22,7 +22,7 @@ import GeneralSettings from '../components/GeneralSettings'
 import SystemSettings from '../components/SystemSettings'
 import SerialSettings from '../components/SerialSettings'
 import SecuritySettings from '../components/SecuritySettings'
-import { Topbar } from '../../../shared'
+import { PageShell } from '../../../shared'
 
 const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
   const { user } = useAuthStore()
@@ -126,7 +126,7 @@ const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
   // Check if user has permission
   if (!user || user.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
         <div className="bg-gray-800 rounded-lg p-8 text-center max-w-md">
           <Shield className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Akses Ditolak</h2>
@@ -138,84 +138,70 @@ const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
     )
   }
 
+  const pageActions = (
+    <>
+      <button
+        onClick={handleExport}
+        disabled={isLoading}
+        className="flex items-center space-x-2 rounded-lg bg-gray-700 px-4 py-2 text-white transition-colors duration-200 hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <Download className="w-4 h-4" />
+        <span>Export</span>
+      </button>
+
+      <label className="flex cursor-pointer items-center space-x-2 rounded-lg bg-gray-700 px-4 py-2 text-white transition-colors duration-200 hover:bg-gray-600">
+        <Upload className="w-4 h-4" />
+        <span>Import</span>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleImport}
+          disabled={isLoading}
+          className="hidden"
+        />
+      </label>
+
+      <button
+        onClick={handleReset}
+        disabled={isLoading}
+        className="flex items-center space-x-2 rounded-lg bg-red-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <RotateCcw className="w-4 h-4" />
+        <span>Reset</span>
+      </button>
+
+      <button
+        onClick={handleSave}
+        disabled={isLoading || !hasChanges}
+        className="flex items-center space-x-2 rounded-lg bg-green-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {isLoading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <Save className="w-4 h-4" />
+        )}
+        <span>{isLoading ? 'Menyimpan...' : 'Simpan'}</span>
+      </button>
+    </>
+  )
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Topbar */}
-      <Topbar
-        title="Smart Mill Scale"
-        subtitle="Pengaturan Sistem"
-        currentUser={currentUser}
-        onLogout={onLogout}
-        onNavigate={onNavigate}
-      />
-
-      {/* Settings Header with Action Buttons */}
-      <div className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                <Settings className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-white">Konfigurasi Sistem</h2>
-                <p className="text-gray-400 text-sm">Kelola pengaturan aplikasi</p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={handleExport}
-                disabled={isLoading}
-                className="flex items-center space-x-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export</span>
-              </button>
-
-              <label className="flex items-center space-x-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-                <Upload className="w-4 h-4" />
-                <span>Import</span>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".json"
-                  onChange={handleImport}
-                  disabled={isLoading}
-                  className="hidden"
-                />
-              </label>
-
-              <button
-                onClick={handleReset}
-                disabled={isLoading}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Reset</span>
-              </button>
-
-              <button
-                onClick={handleSave}
-                disabled={isLoading || !hasChanges}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                <span>{isLoading ? 'Menyimpan...' : 'Simpan'}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <PageShell
+      title="Smart Mill Scale"
+      subtitle="Pengaturan Sistem"
+      currentUser={currentUser}
+      onLogout={onLogout}
+      onNavigate={onNavigate}
+      pageTitle="Konfigurasi Sistem"
+      pageDescription="Kelola pengaturan aplikasi dengan action bar yang tetap rapi pada resolusi laptop dan desktop."
+      pageActions={pageActions}
+      contentWidth="standard"
+    >
 
       {/* Alert Messages */}
       {error && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div className="mt-4">
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -234,7 +220,7 @@ const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
       )}
 
       {importResult && (
-        <div className={`max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 ${
+        <div className={`mt-4 ${
           importResult.success ? 'animate-pulse' : ''
         }`}>
           <div className={`${importResult.success ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'} border rounded-lg p-4`}>
@@ -291,26 +277,28 @@ const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
       )}
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="pt-4">
         {/* Tabs */}
-        <div className="flex space-x-1 mb-8 border-b border-gray-700">
-          {tabs.map(tab => {
-            const IconComponent = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-3 border-b-2 transition-colors duration-200 ${
-                  activeTab === tab.id
-                    ? 'border-purple-500 text-purple-400'
-                    : 'border-transparent text-gray-400 hover:text-gray-300'
-                }`}
-              >
-                <IconComponent className="w-5 h-5" />
-                <span>{tab.label}</span>
-              </button>
-            )
-          })}
+        <div className="mb-8 overflow-x-auto border-b border-gray-700">
+          <div className="flex min-w-max gap-1">
+            {tabs.map(tab => {
+              const IconComponent = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`flex items-center space-x-2 whitespace-nowrap px-4 py-3 border-b-2 transition-colors duration-200 ${
+                    activeTab === tab.id
+                      ? 'border-purple-500 text-purple-400'
+                      : 'border-transparent text-gray-400 hover:text-gray-300'
+                  }`}
+                >
+                  <IconComponent className="w-5 h-5" />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Tab Content */}
@@ -343,7 +331,7 @@ const SettingsPage = ({ currentUser, wails, onNavigate, onLogout }) => {
           </div>
         )}
       </div>
-    </div>
+    </PageShell>
   )
 }
 

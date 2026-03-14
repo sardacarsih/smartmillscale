@@ -1,4 +1,4 @@
-import React from 'react'
+import { useMemo } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { Box, Chip, IconButton, Tooltip } from '@mui/material'
 import {
@@ -18,6 +18,11 @@ const UserDataGrid = ({
   selectedUsers = [],
   onSelectionChange,
 }) => {
+  const selectionModel = useMemo(() => ({
+    type: 'include',
+    ids: new Set(Array.isArray(selectedUsers) ? selectedUsers : []),
+  }), [selectedUsers])
+
   const columns = [
     {
       field: 'username',
@@ -85,9 +90,7 @@ const UserDataGrid = ({
       field: 'createdAt',
       headerName: 'Dibuat',
       width: 150,
-      valueFormatter: (params) => {
-        return new Date(params).toLocaleDateString('id-ID')
-      },
+      valueFormatter: (value) => (value ? new Date(value).toLocaleDateString('id-ID') : '-'),
     },
     {
       field: 'actions',
@@ -142,12 +145,13 @@ const UserDataGrid = ({
   ]
 
   return (
-    <Box sx={{ height: 600, width: '100%' }}>
+    <Box sx={{ height: 'clamp(420px, 56vh, 640px)', width: '100%' }}>
       <DataGrid
         rows={Array.isArray(users) ? users : []}
         columns={columns}
         loading={loading}
-        getRowId={(row) => row.id || row.ID || Math.random().toString(36)}
+        density="compact"
+        getRowId={(row) => row.id || row.ID || row.username || row.email}
         checkboxSelection
         disableRowSelectionOnClick
         pagination
@@ -158,12 +162,13 @@ const UserDataGrid = ({
         }}
         pageSizeOptions={[10, 20, 50, 100]}
         onRowSelectionModelChange={(newSelection) => {
-          if (onSelectionChange && Array.isArray(newSelection)) {
-            onSelectionChange(newSelection)
+          if (onSelectionChange) {
+            onSelectionChange(Array.from(newSelection?.ids ?? []))
           }
         }}
-        rowSelectionModel={Array.isArray(selectedUsers) ? selectedUsers : []}
+        rowSelectionModel={selectionModel}
         sx={{
+          minWidth: 900,
           '& .MuiDataGrid-row:hover': {
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
           },

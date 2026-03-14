@@ -24,7 +24,7 @@ const TimbanganDashboard = ({ wails }) => {
 
   if (dashboardLoading || metricsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-[40vh] items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white">Loading weighing dashboard...</p>
@@ -42,7 +42,7 @@ const TimbanganDashboard = ({ wails }) => {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {metrics && Object.entries(metrics).map(([key, metric]) => (
           <MetricCard key={key} metric={metric} />
         ))}

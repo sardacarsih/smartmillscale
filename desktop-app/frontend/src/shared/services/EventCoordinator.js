@@ -19,7 +19,7 @@ class EventCoordinator {
     }
 
     // Debug logging
-    this.debugMode = process.env.NODE_ENV === 'development'
+    this.debugMode = import.meta.env.DEV
     this.logPrefix = '🎯 [EventCoordinator]'
   }
 

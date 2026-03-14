@@ -3,7 +3,7 @@ import Timbang1Page from '../../features/timbang1/pages/Timbang1Page'
 import { RoleDashboard } from '../../features/dashboard'
 import { ProfilePage } from '../../features/profile'
 import { HelpPage } from '../../features/help'
-import { Notification, ErrorBoundary, Topbar } from '..'
+import { Notification, ErrorBoundary, PageShell } from '..'
 import ServiceBoundary from './ServiceBoundary'
 import LoadingScreen from './LoadingScreen'
 
@@ -53,32 +53,37 @@ const AppRouter = ({
     onLogout
   }
 
+  let pageContent = null
+
   switch (currentPage) {
     case 'profile':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <ProfilePage {...commonProps} />
         </ErrorBoundary>
       )
+      break
 
     case 'help':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <HelpPage {...commonProps} />
         </ErrorBoundary>
       )
+      break
 
     case 'settings':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <SuspenseLoader message="Loading Settings...">
             <SettingsPage {...commonProps} />
           </SuspenseLoader>
         </ErrorBoundary>
       )
+      break
 
     case 'timbang1':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <ServiceBoundary
             isAuthenticated={isAuthenticated}
@@ -89,9 +94,10 @@ const AppRouter = ({
           </ServiceBoundary>
         </ErrorBoundary>
       )
+      break
 
     case 'users':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <ServiceBoundary
             isAuthenticated={isAuthenticated}
@@ -104,18 +110,20 @@ const AppRouter = ({
           </ServiceBoundary>
         </ErrorBoundary>
       )
+      break
 
     case 'audit':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <SuspenseLoader message="Loading Audit Log...">
             <AuditLogViewer {...commonProps} />
           </SuspenseLoader>
         </ErrorBoundary>
       )
+      break
 
     case 'sync-management':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <ServiceBoundary
             isAuthenticated={isAuthenticated}
@@ -128,65 +136,68 @@ const AppRouter = ({
           </ServiceBoundary>
         </ErrorBoundary>
       )
+      break
 
     case 'master-data':
-      return (
+      pageContent = (
         <ErrorBoundary>
           <SuspenseLoader message="Loading Master Data...">
             <MasterDataPage {...commonProps} />
           </SuspenseLoader>
         </ErrorBoundary>
       )
+      break
 
     case 'pks-reports':
-      return (
+      pageContent = (
         <ErrorBoundary>
-          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-            <Topbar
-              title="Smart Mill Scale"
-              subtitle="Laporan PKS"
-              currentUser={user}
-              onLogout={onLogout}
-              onNavigate={onNavigate}
-            />
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <SuspenseLoader message="Loading PKS Reports...">
-                <PKSReportsPage {...commonProps} />
-              </SuspenseLoader>
-            </main>
-            <Notification
-              notifications={notifications}
-              onRemove={onRemoveNotification}
-              onClearAll={onClearAllNotifications}
-            />
-          </div>
+          <PageShell
+            title="Smart Mill Scale"
+            subtitle="Laporan PKS"
+            currentUser={user}
+            onLogout={onLogout}
+            onNavigate={onNavigate}
+            pageTitle="Laporan PKS"
+            pageDescription="Analisis transaksi, tren, dan performa operasional."
+            contentWidth="full"
+          >
+            <SuspenseLoader message="Loading PKS Reports...">
+              <PKSReportsPage {...commonProps} />
+            </SuspenseLoader>
+          </PageShell>
         </ErrorBoundary>
       )
+      break
 
     // Default: Dashboard
     default:
-      return (
+      pageContent = (
         <ErrorBoundary>
-          <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-            <Topbar
-              title="Smart Mill Scale"
-              subtitle="Database-Only Mode"
-              currentUser={user}
-              onLogout={onLogout}
-              onNavigate={onNavigate}
-            />
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <RoleDashboard wails={wails} />
-            </main>
-            <Notification
-              notifications={notifications}
-              onRemove={onRemoveNotification}
-              onClearAll={onClearAllNotifications}
-            />
-          </div>
+          <PageShell
+            title="Smart Mill Scale"
+            subtitle="Database-Only Mode"
+            currentUser={user}
+            onLogout={onLogout}
+            onNavigate={onNavigate}
+            contentWidth="wide"
+          >
+            <RoleDashboard wails={wails} />
+          </PageShell>
         </ErrorBoundary>
       )
+      break
   }
+
+  return (
+    <>
+      {pageContent}
+      <Notification
+        notifications={notifications}
+        onRemove={onRemoveNotification}
+        onClearAll={onClearAllNotifications}
+      />
+    </>
+  )
 }
 
 export default AppRouter

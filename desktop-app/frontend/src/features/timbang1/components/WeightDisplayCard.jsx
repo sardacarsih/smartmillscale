@@ -25,9 +25,9 @@ const WeightDisplayCard = ({
   }, [currentWeight])
 
   return (
-    <div className="bg-gray-900 rounded-lg p-6 space-y-4">
+    <div className="rounded-2xl border border-gray-700 bg-gray-900 p-4 shadow-inner shadow-black/20 sm:p-6">
       {/* Status Badges Row */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500 animate-pulse'
             }`} />
@@ -38,23 +38,23 @@ const WeightDisplayCard = ({
 
         {/* Monitoring status badge */}
         {isMonitoring ? (
-          <span className="text-xs px-2 py-1 rounded-full bg-green-500/20 text-green-400">
+          <span className="w-fit rounded-full bg-green-500/20 px-2 py-1 text-xs text-green-400">
             Real-time Active
           </span>
         ) : (
-          <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-400">
+          <span className="w-fit rounded-full bg-yellow-500/20 px-2 py-1 text-xs text-yellow-400">
             Mock Mode
           </span>
         )}
       </div>
 
       {/* Weight Display */}
-      <div className="text-center">
+      <div className="mt-5 text-center">
         <div className="text-sm text-gray-400 mb-2">Berat Saat Ini</div>
-        <div className={`text-5xl font-bold mb-2 ${isStable ? 'text-green-400' : 'text-yellow-400'
+        <div className={`text-4xl font-bold tracking-tight sm:text-5xl xl:text-6xl ${isStable ? 'text-green-400' : 'text-yellow-400'
           }`}>
           {weightInKg}
-          <span className="text-2xl ml-2">kg</span>
+          <span className="ml-2 text-xl sm:text-2xl">kg</span>
         </div>
         {/* Color coding indicates stability: green = stable, yellow = unstable */}
         {/* No text indicator per user requirements */}

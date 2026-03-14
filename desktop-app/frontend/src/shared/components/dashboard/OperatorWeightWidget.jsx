@@ -1,4 +1,3 @@
-import React from 'react'
 import useGlobalWeightStore from '../../store/useGlobalWeightStore'
 import { formatWeight } from '../../utils/formatters'
 
@@ -18,14 +17,11 @@ const OperatorWeightWidget = ({ wails, className = '' }) => {
     isStable,
     isConnected,
     isMonitoring,
-    unit,
     lastUpdate
   } = useGlobalWeightStore()
 
   // Derived state
   const hasAccess = true // Always show for operator dashboard
-  const formattedWeight = formatWeight(currentWeight)
-  const weightInKg = currentWeight / 100
   const connectionStatus = isConnected ? 'Terhubung' : 'Terputus'
   const isReadyForCapture = isStable && isConnected
 
@@ -37,9 +33,9 @@ const OperatorWeightWidget = ({ wails, className = '' }) => {
     <div className={`bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border-2 ${isConnected ?
       (isStable ? 'border-green-500' : 'border-yellow-500') :
       'border-red-500'
-      } p-8 ${className}`}>
+      } p-4 sm:p-6 xl:p-8 ${className}`}>
       {/* Status Badge */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'
             }`} />
@@ -58,15 +54,15 @@ const OperatorWeightWidget = ({ wails, className = '' }) => {
       {/* Main Weight Display - Extra Large */}
       <div className="text-center mb-6">
         <p className="text-sm text-gray-400 mb-2">BERAT TIMBANGAN</p>
-        <div className={`text-8xl font-bold font-mono mb-2 ${isConnected ? (isStable ? 'text-green-400' : 'text-yellow-400') : 'text-red-400'
+        <div className={`mb-2 font-mono text-5xl font-bold sm:text-6xl xl:text-7xl 2xl:text-8xl ${isConnected ? (isStable ? 'text-green-400' : 'text-yellow-400') : 'text-red-400'
           }`}>
           {isConnected ? formatWeight(currentWeight, 'kg', true).replace(' kg', '') : '---.-'}
         </div>
-        <p className="text-2xl text-gray-300 font-medium">KILOGRAM</p>
+        <p className="text-lg font-medium text-gray-300 sm:text-xl xl:text-2xl">KILOGRAM</p>
       </div>
 
       {/* Status Indicators */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
         {/* Stability Status */}
         <div className={`rounded-lg p-4 text-center ${isStable ? 'bg-green-500/20' : 'bg-yellow-500/20'
           }`}>
@@ -95,8 +91,8 @@ const OperatorWeightWidget = ({ wails, className = '' }) => {
       </div>
 
       {/* Quick Actions / Info */}
-      <div className="bg-gray-750 rounded-lg p-4">
-        <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="bg-gray-750 rounded-lg p-4">
+        <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div>
             <p className="text-gray-400 mb-1">Koneksi</p>
             <p className={`font-medium ${isConnected ? 'text-green-400' : 'text-red-400'}`}>

@@ -1,6 +1,10 @@
+import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import DataTable from './DataTable'
+
+const h = React.createElement
 
 describe('DataTable', () => {
   const columns = [
@@ -12,16 +16,14 @@ describe('DataTable', () => {
     const onEdit = vi.fn()
     const onDelete = vi.fn()
 
-    render(
-      <DataTable
-        data={[{ id: 1, kode_estate: 'EST01', nama_estate: 'Estate 1', data_source: 'SERVER' }]}
-        columns={columns}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        canEdit={() => false}
-        canDelete={() => false}
-      />
-    )
+    render(h(DataTable, {
+      data: [{ id: 1, kode_estate: 'EST01', nama_estate: 'Estate 1', data_source: 'SERVER' }],
+      columns,
+      onEdit,
+      onDelete,
+      canEdit: () => false,
+      canDelete: () => false
+    }))
 
     const editButton = screen.getByRole('button', { name: 'Edit' })
     const deleteButton = screen.getByRole('button', { name: 'Delete' })

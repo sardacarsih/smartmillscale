@@ -111,6 +111,41 @@ Critical path testing:
 - Login flow
 - Main navigation
 - Core features
+- Desktop viewport fit across authenticated admin pages
+
+## Desktop Layout Smoke Coverage
+
+The desktop responsiveness smoke suite lives in `e2e/desktop-layout-smoke.spec.js`.
+
+It logs in as `admin`, navigates through the authenticated admin pages from the user menu, and verifies:
+- the page heading is visible
+- the authenticated shell remains usable
+- there is no page-level horizontal overflow at common PC/laptop sizes
+
+Run it directly:
+
+```bash
+npx playwright test e2e/desktop-layout-smoke.spec.js
+```
+
+Run one viewport case by name:
+
+```bash
+npx playwright test e2e/desktop-layout-smoke.spec.js --grep "1366x768"
+```
+
+The supervisor coverage lives in `e2e/supervisor-layout-smoke.spec.js` and uses a dev-only app test hook to inject a supervisor session without depending on the mock login response.
+
+```bash
+npx playwright test e2e/supervisor-layout-smoke.spec.js
+```
+
+The same dev-only hook is used for the remaining role-specific desktop smoke suites:
+
+```bash
+npx playwright test e2e/timbangan-layout-smoke.spec.js
+npx playwright test e2e/grading-layout-smoke.spec.js
+```
 
 ## 📊 Test Reports
 
